@@ -9,6 +9,13 @@ type Props = {
   fallbackLabel?: string;
   priority?: boolean;
   sizes?: string;
+  /**
+   * "cover" (default) recorta para llenar el contenedor — ideal para
+   * miniaturas/grillas/fondos. "contain" muestra la imagen/video completo
+   * sin recortar (con barras si no coincide el aspecto) — para el visor a
+   * pantalla completa.
+   */
+  fit?: "cover" | "contain";
 };
 
 /**
@@ -22,8 +29,10 @@ export default function PlaceholderMedia({
   fallbackLabel,
   priority,
   sizes,
+  fit = "cover",
 }: Props) {
   const label = fallbackLabel ?? item?.alt ?? "Contenido pendiente";
+  const fitClass = fit === "contain" ? "object-contain" : "object-cover";
 
   if (item?.src) {
     const isVideo =
@@ -35,7 +44,7 @@ export default function PlaceholderMedia({
           <video
             src={item.src}
             poster={item.poster}
-            className="h-full w-full object-cover"
+            className={`h-full w-full ${fitClass}`}
             muted
             loop
             playsInline
@@ -53,7 +62,7 @@ export default function PlaceholderMedia({
           fill
           priority={priority}
           sizes={sizes ?? "100vw"}
-          className="object-cover"
+          className={fitClass}
         />
       </div>
     );

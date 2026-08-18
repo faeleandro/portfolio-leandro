@@ -5,7 +5,7 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import Cursor from "@/components/Cursor";
 import AnimatedBackground from "@/components/AnimatedBackground";
-import { SITE } from "@/lib/site";
+import { getSite } from "@/lib/site";
 
 const displayFont = Archivo_Black({
   subsets: ["latin"],
@@ -18,10 +18,13 @@ const bodyFont = Inter({
   variable: "--font-body",
 });
 
-export const metadata: Metadata = {
-  title: `${SITE.name} — Portafolio Creativo`,
-  description: SITE.role,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSite();
+  return {
+    title: `${site.name} — Portafolio Creativo`,
+    description: site.role,
+  };
+}
 
 export default function RootLayout({
   children,

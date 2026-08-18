@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type TouchEvent } from "react";
+import { createPortal } from "react-dom";
 import { MediaItem } from "@/lib/types";
 import PlaceholderMedia from "./PlaceholderMedia";
 
@@ -65,7 +66,7 @@ export default function LightboxViewer({
     touchStartX.current = null;
   }
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-[200] flex flex-col bg-ink/95 backdrop-blur-sm"
       role="dialog"
@@ -102,6 +103,7 @@ export default function LightboxViewer({
                 fallbackLabel={item.alt ?? `Contenido pendiente — ${title}`}
                 className="h-full w-full max-w-5xl"
                 sizes="100vw"
+                fit="contain"
               />
             </div>
           ))}
@@ -134,6 +136,7 @@ export default function LightboxViewer({
       <div className="px-6 py-5 text-center font-mono text-xs uppercase tracking-widest2 text-white/80 md:px-10">
         {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

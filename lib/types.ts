@@ -20,14 +20,8 @@ export type MediaItem = {
   caption?: string;
 };
 
-export type CollectionSlug =
-  | "re-estudio-creativo"
-  | "almagourmet"
-  | "trabajos-independientes"
-  | "agencia-wedo";
-
 export type Collection = {
-  slug: CollectionSlug;
+  slug: string;
   /** Orden cronológico de aparición. No implica jerarquía de importancia. */
   order: number;
   title: string;
@@ -40,7 +34,7 @@ export type Collection = {
 export type Project = {
   /** Identificador único dentro de su colección, usado en la URL. */
   slug: string;
-  collection: CollectionSlug;
+  collection: string;
   title: string;
   client?: string;
   year?: number | string;
@@ -57,4 +51,23 @@ export type Project = {
   results?: MediaItem[];
   website?: string;
   instagram?: string;
+};
+
+export type SiteData = {
+  name: string;
+  handle: string;
+  role: string;
+  email: string;
+  instagram?: string;
+  linkedin?: string;
+  whatsapp?: string;
+  photo?: MediaItem;
+  /** Párrafos de la bio en /about (uno por elemento). */
+  bio: string[];
+};
+
+export type ContentData = {
+  site: SiteData;
+  collections: Collection[];
+  projects: Project[];
 };

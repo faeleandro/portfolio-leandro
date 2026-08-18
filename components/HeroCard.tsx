@@ -1,18 +1,20 @@
 import PlaceholderMedia from "./PlaceholderMedia";
-import { SITE } from "@/lib/site";
+import { getSite } from "@/lib/site";
 
 /**
  * Tarjeta de portada de la home: foto + título, estilo tarjeta redondeada
  * con fondo lima.
  */
-export default function HeroCard() {
+export default async function HeroCard() {
+  const site = await getSite();
+
   return (
     <div className="relative overflow-hidden rounded-[2.5rem] bg-lime px-6 py-8 md:px-12 md:py-12">
       <div className="flex flex-col gap-8 md:flex-row md:items-center md:gap-12">
         <div className="mx-auto w-full max-w-xs shrink-0 md:mx-0">
           <PlaceholderMedia
-            item={SITE.photo}
-            fallbackLabel={`Foto pendiente — ${SITE.name}`}
+            item={site.photo}
+            fallbackLabel={`Foto pendiente — ${site.name}`}
             className="aspect-[4/5] w-full rounded-[2rem]"
             sizes="(min-width: 768px) 320px, 80vw"
           />

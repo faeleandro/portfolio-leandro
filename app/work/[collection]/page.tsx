@@ -3,36 +3,40 @@ import { notFound } from "next/navigation";
 import EditorialList, { EditorialListItem } from "@/components/EditorialList";
 import PillBreadcrumb from "@/components/PillBreadcrumb";
 import Reveal from "@/components/Reveal";
-import { getCollectionBySlug, getCollections } from "@/lib/collections";
+import { getCollectionBySlug } from "@/lib/collections";
 import { getProjectsByCollection } from "@/lib/projects";
-import { SITE } from "@/lib/site";
+import { getSite } from "@/lib/site";
 
-export function generateStaticParams() {
-  return getCollections().map((c) => ({ collection: c.slug }));
-}
+// El contenido vive en Vercel Blob y puede cambiar en cualquier momento
+// desde /admin — se renderiza siempre en el momento, sin cachear páginas
+// estáticas viejas.
+export const dynamic = "force-dynamic";
 
-export function generateMetadata({
+export async function generateMetadata({
   params,
 }: {
   params: { collection: string };
-}): Metadata {
-  const collection = getCollectionBySlug(params.collection);
+}): Promise<Metadata> {
+  const [collection, site] = await Promise.all([
+    getCollectionBySlug(params.collection),
+    getSite(),
+  ]);
   if (!collection) return {};
   return {
-    title: `${collection.title} — ${SITE.name}`,
+    title: `${collection.title} — ${site.name}`,
     description: collection.description,
   };
 }
 
-export default function CollectionPage({
+export default async function CollectionPage({
   params,
 }: {
   params: { collection: string };
 }) {
-  const collection = getCollectionBySlug(params.collection);
+  const collection = await getCollectionBySlug(params.collection);
   if (!collection) notFound();
 
-  const projects = getProjectsByCollection(collection.slug);
+  const projects = await getProjectsByCollection(collection.slug);
 
   const items: EditorialListItem[] = projects.map((p, i) => ({
     index: i + 1,

@@ -1,11 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getCollectionBySlug, getCollections } from "@/lib/collections";
-import {
-  getNextProject,
-  getProjectBySlug,
-  getProjectsByCollection,
-} from "@/lib/projects";
+import { getCollectionBySlug } from "@/lib/collections";
+import { getNextProject, getProjectBySlug } from "@/lib/projects";
 import PlaceholderMedia from "@/components/PlaceholderMedia";
 import VideoBlock from "@/components/VideoBlock";
 import Gallery from "@/components/Gallery";
@@ -14,42 +10,41 @@ import SectionHeading from "@/components/SectionHeading";
 import NextProjectLink from "@/components/NextProjectLink";
 import PillBreadcrumb from "@/components/PillBreadcrumb";
 import Reveal from "@/components/Reveal";
-import { SITE } from "@/lib/site";
+import { getSite } from "@/lib/site";
 
-export function generateStaticParams() {
-  return getCollections().flatMap((c) =>
-    getProjectsByCollection(c.slug).map((p) => ({
-      collection: c.slug,
-      project: p.slug,
-    }))
-  );
-}
+// El contenido vive en Vercel Blob y puede cambiar en cualquier momento
+// desde /admin — se renderiza siempre en el momento, sin cachear páginas
+// estáticas viejas.
+export const dynamic = "force-dynamic";
 
-export function generateMetadata({
+export async function generateMetadata({
   params,
 }: {
   params: { collection: string; project: string };
-}): Metadata {
-  const project = getProjectBySlug(params.collection, params.project);
+}): Promise<Metadata> {
+  const [project, site] = await Promise.all([
+    getProjectBySlug(params.collection, params.project),
+    getSite(),
+  ]);
   if (!project) return {};
   return {
-    title: `${project.title} — ${SITE.name}`,
-    description: project.description ?? `${project.title} — ${SITE.name}`,
+    title: `${project.title} — ${site.name}`,
+    description: project.description ?? `${project.title} — ${site.name}`,
   };
 }
 
-export default function ProjectPage({
+export default async function ProjectPage({
   params,
 }: {
   params: { collection: string; project: string };
 }) {
-  const collection = getCollectionBySlug(params.collection);
+  const collection = await getCollectionBySlug(params.collection);
   if (!collection) notFound();
 
-  const project = getProjectBySlug(params.collection, params.project);
+  const project = await getProjectBySlug(params.collection, params.project);
   if (!project) notFound();
 
-  const nextProject = getNextProject(project.slug);
+  const nextProject = await getNextProject(project.slug);
 
   const heroBackground = project.coverImage ?? project.heroVideo;
   const hasImages = Boolean(project.images && project.images.length);

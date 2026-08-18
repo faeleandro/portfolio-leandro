@@ -1,22 +1,31 @@
 import type { Metadata } from "next";
-import { SITE } from "@/lib/site";
+import { getSite } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: `Contact — ${SITE.name}`,
-  description: `Contactá a ${SITE.name}.`,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSite();
+  return {
+    title: `Contact — ${site.name}`,
+    description: `Contactá a ${site.name}.`,
+  };
+}
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const site = await getSite();
+
   const links = [
-    { label: "Email", href: `mailto:${SITE.email}`, value: SITE.email },
-    SITE.instagram
-      ? { label: "Instagram", href: SITE.instagram, value: SITE.handle }
+    { label: "Email", href: `mailto:${site.email}`, value: site.email },
+    site.instagram
+      ? { label: "Instagram", href: site.instagram, value: site.handle }
       : null,
-    SITE.linkedin
-      ? { label: "LinkedIn", href: SITE.linkedin, value: SITE.linkedin }
+    site.linkedin
+      ? { label: "LinkedIn", href: site.linkedin, value: site.linkedin }
       : null,
-    SITE.whatsapp
-      ? { label: "WhatsApp", href: SITE.whatsapp, value: "+54 9 2617 48-6501" }
+    site.whatsapp
+      ? {
+          label: "WhatsApp",
+          href: `https://wa.me/${site.whatsapp.replace(/\D/g, "")}`,
+          value: site.whatsapp,
+        }
       : null,
   ].filter(Boolean) as { label: string; href: string; value: string }[];
 

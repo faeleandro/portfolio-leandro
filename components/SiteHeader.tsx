@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SITE } from "@/lib/site";
+import { getSite } from "@/lib/site";
 
 const pillClass =
   "group relative overflow-hidden rounded-full border border-line/30 px-4 py-2 font-mono text-xs uppercase tracking-widest2 text-cream transition-colors duration-500 ease-editorial hover:text-ink";
@@ -13,13 +13,15 @@ function PillFill() {
   );
 }
 
-export default function SiteHeader() {
+export default async function SiteHeader() {
+  const site = await getSite();
+
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-line/10 bg-paper/90 backdrop-blur-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4 md:px-10">
         <Link href="/" className={pillClass}>
           <PillFill />
-          {SITE.name}
+          {site.name}
         </Link>
         <nav className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest2 text-cream sm:gap-3">
           <Link href="/#work" className={pillClass}>

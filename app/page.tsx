@@ -3,7 +3,7 @@ import HeroCard from "@/components/HeroCard";
 import MarqueeStrip from "@/components/MarqueeStrip";
 import Reveal from "@/components/Reveal";
 import { getCollections } from "@/lib/collections";
-import { SITE } from "@/lib/site";
+import { getSite } from "@/lib/site";
 
 const TAGS = [
   "Fotografía",
@@ -13,8 +13,8 @@ const TAGS = [
   "Dirección de Arte",
 ];
 
-export default function HomePage() {
-  const collections = getCollections();
+export default async function HomePage() {
+  const [collections, site] = await Promise.all([getCollections(), getSite()]);
 
   const items: EditorialListItem[] = collections.map((c) => ({
     index: c.order,
@@ -32,7 +32,7 @@ export default function HomePage() {
         </Reveal>
         <Reveal delay={150}>
           <p className="mt-8 max-w-xl font-mono text-xs uppercase tracking-widest2 text-muted">
-            {SITE.role}
+            {site.role}
           </p>
           <p className="mt-4 max-w-xl text-sm text-muted md:text-base">
             Un recorrido profesional contado en cuatro etapas, en orden
