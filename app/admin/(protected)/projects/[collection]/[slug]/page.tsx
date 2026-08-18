@@ -1,7 +1,11 @@
 import { notFound } from "next/navigation";
 import { getProjectBySlug } from "@/lib/projects";
 import { MediaItem } from "@/lib/types";
-import { saveProjectDetails, removeListMedia } from "../../../../actions";
+import {
+  saveProjectDetails,
+  removeListMedia,
+  removeSingleMedia,
+} from "../../../../actions";
 import ConfirmSubmitButton from "@/components/admin/ConfirmSubmitButton";
 import MediaUploader from "@/components/admin/MediaUploader";
 
@@ -133,8 +137,19 @@ export default async function EditProjectPage({
           Foto de portada
         </h2>
         {project.coverImage?.src && (
-          <div className="mb-4">
+          <div className="mb-4 flex items-end gap-3">
             <Thumb item={project.coverImage} />
+            <form action={removeSingleMedia}>
+              <input type="hidden" name="collection" value={params.collection} />
+              <input type="hidden" name="slug" value={params.slug} />
+              <input type="hidden" name="field" value="coverImage" />
+              <ConfirmSubmitButton
+                confirmMessage="¿Quitar la portada actual?"
+                className="font-mono text-[10px] uppercase tracking-widest2 text-muted transition-colors hover:text-red-400"
+              >
+                Quitar
+              </ConfirmSubmitButton>
+            </form>
           </div>
         )}
         <MediaUploader
@@ -153,8 +168,19 @@ export default async function EditProjectPage({
           peso, se sube y comprime automáticamente)
         </h2>
         {project.heroVideo?.src && (
-          <div className="mb-4">
+          <div className="mb-4 flex items-end gap-3">
             <Thumb item={project.heroVideo} />
+            <form action={removeSingleMedia}>
+              <input type="hidden" name="collection" value={params.collection} />
+              <input type="hidden" name="slug" value={params.slug} />
+              <input type="hidden" name="field" value="heroVideo" />
+              <ConfirmSubmitButton
+                confirmMessage="¿Quitar el video actual?"
+                className="font-mono text-[10px] uppercase tracking-widest2 text-muted transition-colors hover:text-red-400"
+              >
+                Quitar
+              </ConfirmSubmitButton>
+            </form>
           </div>
         )}
         <MediaUploader

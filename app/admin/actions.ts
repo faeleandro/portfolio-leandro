@@ -279,6 +279,22 @@ export async function finalizeListMedia(
   return { count: added.length };
 }
 
+export async function removeSingleMedia(formData: FormData) {
+  await requireAdmin();
+  const collection = textField(formData, "collection")!;
+  const slug = textField(formData, "slug")!;
+  const field = textField(formData, "field") as SingleMediaField;
+
+  await runOrRedirect(async () => {
+    const { content, project } = await findProject(collection, slug);
+    delete project[field];
+    await saveContent(content);
+  }, `/admin/projects/${collection}/${slug}?error=save`);
+
+  revalidatePublicPages();
+  redirect(`/admin/projects/${collection}/${slug}?saved=1`);
+}
+
 export async function removeListMedia(formData: FormData) {
   await requireAdmin();
   const collection = textField(formData, "collection")!;
