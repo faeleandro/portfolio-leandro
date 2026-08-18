@@ -48,7 +48,7 @@ export default function Cursor() {
         }
       `}</style>
       <div
-        className={`pointer-events-none fixed z-[100] flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-lime/80 bg-ink/70 text-center font-mono text-[10px] uppercase tracking-widest2 text-lime backdrop-blur-sm transition-opacity duration-200 ${
+        className={`pointer-events-none fixed z-[100] flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-lime/80 bg-ink/70 text-center font-mono text-[9px] uppercase tracking-widest2 text-lime backdrop-blur-sm transition-opacity duration-200 ${
           label ? "opacity-100" : "opacity-0"
         }`}
         style={{ left: pos.x, top: pos.y }}

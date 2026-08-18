@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getContent, saveContent } from "@/lib/content";
-import { uploadMedia } from "@/lib/media";
+import { compressUploadedBlob } from "@/lib/media";
 import { requireAdmin } from "@/lib/auth";
 import { slugify } from "@/lib/slugify";
 import { MediaItem, Project } from "@/lib/types";
@@ -69,25 +69,6 @@ export async function saveSite(formData: FormData) {
         .filter(Boolean);
     }
 
-    await saveContent(content);
-  }, "/admin/site?error=save");
-
-  revalidatePublicPages();
-  redirect("/admin/site?saved=1");
-}
-
-export async function uploadSitePhoto(formData: FormData) {
-  await requireAdmin();
-  const file = formData.get("photo");
-  if (!(file instanceof File) || file.size === 0) {
-    redirect("/admin/site?error=nofile");
-  }
-
-  await runOrRedirect(async () => {
-    const content = await getContent();
-    const url = await uploadMedia(file, "site");
-    const previousAlt = content.site.photo?.alt ?? content.site.name;
-    content.site.photo = { src: url, alt: previousAlt };
     await saveContent(content);
   }, "/admin/site?error=save");
 
@@ -214,11 +195,16 @@ export async function deleteProject(formData: FormData) {
 }
 
 // ---------------------------------------------------------------------------
-// Media de un proyecto (portada, video, galería, proceso, resultado)
+// Media (portada, video, galería, proceso, resultado, foto de sitio)
+//
+// El archivo se sube directo del navegador a Vercel Blob (ver
+// app/api/blob-upload/route.ts) — así no hay límite de tamaño. Estas
+// acciones reciben la URL cruda ya subida, la comprimen (foto o video) y
+// actualizan el contenido del sitio.
 // ---------------------------------------------------------------------------
 
-type SingleMediaField = "coverImage" | "heroVideo";
-type ListMediaField = "images" | "process" | "results";
+export type SingleMediaField = "coverImage" | "heroVideo";
+export type ListMediaField = "images" | "process" | "results";
 
 async function findProject(collection: string, slug: string) {
   const content = await getContent();
@@ -229,67 +215,68 @@ async function findProject(collection: string, slug: string) {
   return { content, project };
 }
 
-export async function uploadSingleMedia(formData: FormData) {
+export async function finalizeSitePhoto(
+  rawUrl: string,
+  originalName: string,
+  contentType: string
+) {
   await requireAdmin();
-  const collection = textField(formData, "collection")!;
-  const slug = textField(formData, "slug")!;
-  const field = textField(formData, "field") as SingleMediaField;
-  const file = formData.get("file");
-
-  if (!(file instanceof File) || file.size === 0) {
-    redirect(`/admin/projects/${collection}/${slug}?error=nofile`);
-  }
-
-  await runOrRedirect(async () => {
-    const { content, project } = await findProject(collection, slug);
-    const url = await uploadMedia(file, `${collection}/${slug}`);
-    const isVideo = file.type.startsWith("video/");
-
-    project[field] = {
-      src: url,
-      type: isVideo ? "video" : "image",
-      alt: project.title,
-    } satisfies MediaItem;
-
-    await saveContent(content);
-  }, `/admin/projects/${collection}/${slug}?error=save`);
-
+  const content = await getContent();
+  const { url } = await compressUploadedBlob(rawUrl, "site", originalName, contentType);
+  const previousAlt = content.site.photo?.alt ?? content.site.name;
+  content.site.photo = { src: url, alt: previousAlt };
+  await saveContent(content);
   revalidatePublicPages();
-  redirect(`/admin/projects/${collection}/${slug}?saved=1`);
+  return { url };
 }
 
-export async function addListMedia(formData: FormData) {
+export async function finalizeSingleMedia(
+  collection: string,
+  slug: string,
+  field: SingleMediaField,
+  rawUrl: string,
+  originalName: string,
+  contentType: string
+) {
   await requireAdmin();
-  const collection = textField(formData, "collection")!;
-  const slug = textField(formData, "slug")!;
-  const field = textField(formData, "field") as ListMediaField;
-  const files = formData.getAll("files").filter((f) => f instanceof File) as File[];
+  const { content, project } = await findProject(collection, slug);
+  const { url, type } = await compressUploadedBlob(
+    rawUrl,
+    `${collection}/${slug}`,
+    originalName,
+    contentType
+  );
+  project[field] = { src: url, type, alt: project.title } satisfies MediaItem;
+  await saveContent(content);
+  revalidatePublicPages();
+  return { url };
+}
 
-  const usableFiles = files.filter((f) => f.size > 0);
-  if (usableFiles.length === 0) {
-    redirect(`/admin/projects/${collection}/${slug}?error=nofile`);
+export async function finalizeListMedia(
+  collection: string,
+  slug: string,
+  field: ListMediaField,
+  uploads: { rawUrl: string; originalName: string; contentType: string }[]
+) {
+  await requireAdmin();
+  const { content, project } = await findProject(collection, slug);
+  const existing = project[field] ?? [];
+
+  const added: MediaItem[] = [];
+  for (const u of uploads) {
+    const { url, type } = await compressUploadedBlob(
+      u.rawUrl,
+      `${collection}/${slug}`,
+      u.originalName,
+      u.contentType
+    );
+    added.push({ src: url, type, alt: project.title });
   }
 
-  await runOrRedirect(async () => {
-    const { content, project } = await findProject(collection, slug);
-    const existing = project[field] ?? [];
-
-    const uploaded: MediaItem[] = [];
-    for (const file of usableFiles) {
-      const url = await uploadMedia(file, `${collection}/${slug}`);
-      uploaded.push({
-        src: url,
-        type: file.type.startsWith("video/") ? "video" : "image",
-        alt: project.title,
-      });
-    }
-
-    project[field] = [...existing, ...uploaded];
-    await saveContent(content);
-  }, `/admin/projects/${collection}/${slug}?error=save`);
-
+  project[field] = [...existing, ...added];
+  await saveContent(content);
   revalidatePublicPages();
-  redirect(`/admin/projects/${collection}/${slug}?saved=1`);
+  return { count: added.length };
 }
 
 export async function removeListMedia(formData: FormData) {

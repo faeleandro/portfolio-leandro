@@ -188,6 +188,7 @@ export const SEED_CONTENT: ContentData = {
       client: "Pato Coffee",
       category: ["Categoría pendiente"],
       description: DESCRIPCION_PROYECTO_PENDIENTE,
+      heroVideo: { type: "video", src: "/work/pato-coffee/video.mp4", alt: "Pato Coffee" },
     },
     {
       slug: "bocon",

@@ -1,21 +1,18 @@
 import { notFound } from "next/navigation";
 import { getProjectBySlug } from "@/lib/projects";
 import { MediaItem } from "@/lib/types";
-import {
-  saveProjectDetails,
-  uploadSingleMedia,
-  addListMedia,
-  removeListMedia,
-} from "../../../../actions";
+import { saveProjectDetails, removeListMedia } from "../../../../actions";
 import ConfirmSubmitButton from "@/components/admin/ConfirmSubmitButton";
+import MediaUploader from "@/components/admin/MediaUploader";
 
 export const dynamic = "force-dynamic";
+// Le da a la compresión de video (ffmpeg, corre dentro de la Server Action
+// de esta página) el máximo tiempo permitido en el plan Hobby de Vercel.
+export const maxDuration = 60;
 
 const inputClass =
   "rounded-lg border border-line/30 bg-transparent px-3 py-2 text-sm text-cream placeholder:text-muted focus:border-lime focus:outline-none";
 const labelClass = "font-mono text-xs uppercase tracking-widest2 text-muted";
-const fileInputClass =
-  "text-sm text-muted file:mr-3 file:rounded-full file:border-0 file:bg-lime file:px-4 file:py-2 file:font-mono file:text-xs file:uppercase file:tracking-widest2 file:text-ink";
 
 function Thumb({ item }: { item: MediaItem }) {
   if (!item.src) return null;
@@ -48,11 +45,6 @@ export default async function EditProjectPage({
         {(searchParams.saved || searchParams.created) && (
           <p className="mt-3 font-mono text-xs uppercase tracking-widest2 text-lime">
             {searchParams.created ? "Proyecto creado ✓" : "Guardado ✓"}
-          </p>
-        )}
-        {searchParams.error === "nofile" && (
-          <p className="mt-3 font-mono text-xs uppercase tracking-widest2 text-red-400">
-            Elegí un archivo antes de subir.
           </p>
         )}
         {searchParams.error === "save" && (
@@ -145,42 +137,33 @@ export default async function EditProjectPage({
             <Thumb item={project.coverImage} />
           </div>
         )}
-        <form action={uploadSingleMedia} className="flex flex-wrap items-center gap-3">
-          <input type="hidden" name="collection" value={params.collection} />
-          <input type="hidden" name="slug" value={params.slug} />
-          <input type="hidden" name="field" value="coverImage" />
-          <input type="file" name="file" accept="image/*" required className={fileInputClass} />
-          <button
-            type="submit"
-            className="rounded-full border border-line/30 px-4 py-2 font-mono text-xs uppercase tracking-widest2 text-cream transition-colors hover:border-lime hover:text-lime"
-          >
-            Subir
-          </button>
-        </form>
+        <MediaUploader
+          kind="single"
+          field="coverImage"
+          accept="image/*"
+          collection={params.collection}
+          slug={params.slug}
+        />
       </section>
 
       {/* Video */}
       <section className="rounded-2xl border border-line/15 p-6 md:p-8">
         <h2 className="mb-4 font-mono text-xs uppercase tracking-widest2 text-lime">
-          Video (horizontal o vertical, se adapta solo)
+          Video (horizontal o vertical, se adapta solo — sin importar el
+          peso, se sube y comprime automáticamente)
         </h2>
         {project.heroVideo?.src && (
           <div className="mb-4">
             <Thumb item={project.heroVideo} />
           </div>
         )}
-        <form action={uploadSingleMedia} className="flex flex-wrap items-center gap-3">
-          <input type="hidden" name="collection" value={params.collection} />
-          <input type="hidden" name="slug" value={params.slug} />
-          <input type="hidden" name="field" value="heroVideo" />
-          <input type="file" name="file" accept="video/*" required className={fileInputClass} />
-          <button
-            type="submit"
-            className="rounded-full border border-line/30 px-4 py-2 font-mono text-xs uppercase tracking-widest2 text-cream transition-colors hover:border-lime hover:text-lime"
-          >
-            Subir
-          </button>
-        </form>
+        <MediaUploader
+          kind="single"
+          field="heroVideo"
+          accept="video/*"
+          collection={params.collection}
+          slug={params.slug}
+        />
       </section>
 
       {/* Galería / Proceso / Resultado */}
@@ -222,25 +205,14 @@ export default async function EditProjectPage({
               </div>
             )}
 
-            <form action={addListMedia} className="flex flex-wrap items-center gap-3">
-              <input type="hidden" name="collection" value={params.collection} />
-              <input type="hidden" name="slug" value={params.slug} />
-              <input type="hidden" name="field" value={field} />
-              <input
-                type="file"
-                name="files"
-                accept="image/*,video/*"
-                multiple
-                required
-                className={fileInputClass}
-              />
-              <button
-                type="submit"
-                className="rounded-full border border-line/30 px-4 py-2 font-mono text-xs uppercase tracking-widest2 text-cream transition-colors hover:border-lime hover:text-lime"
-              >
-                Agregar
-              </button>
-            </form>
+            <MediaUploader
+              kind="list"
+              field={field}
+              accept="image/*,video/*"
+              collection={params.collection}
+              slug={params.slug}
+              buttonLabel="Agregar"
+            />
           </section>
         );
       })}

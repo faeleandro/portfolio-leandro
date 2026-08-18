@@ -1,5 +1,6 @@
 import { getSite } from "@/lib/site";
-import { saveSite, uploadSitePhoto } from "../../actions";
+import { saveSite } from "../../actions";
+import MediaUploader from "@/components/admin/MediaUploader";
 
 export const dynamic = "force-dynamic";
 
@@ -31,11 +32,6 @@ export default async function AdminSitePage({
             (variable BLOB_READ_WRITE_TOKEN) e intentá de nuevo.
           </p>
         )}
-        {searchParams.error === "nofile" && (
-          <p className="mt-3 font-mono text-xs uppercase tracking-widest2 text-red-400">
-            Elegí un archivo antes de subir.
-          </p>
-        )}
       </div>
 
       <section className="rounded-2xl border border-line/15 p-6 md:p-8">
@@ -50,21 +46,7 @@ export default async function AdminSitePage({
             className="mb-4 h-40 w-32 rounded-xl object-cover"
           />
         )}
-        <form action={uploadSitePhoto} className="flex flex-wrap items-center gap-3">
-          <input
-            type="file"
-            name="photo"
-            accept="image/*"
-            required
-            className="text-sm text-muted file:mr-3 file:rounded-full file:border-0 file:bg-lime file:px-4 file:py-2 file:font-mono file:text-xs file:uppercase file:tracking-widest2 file:text-ink"
-          />
-          <button
-            type="submit"
-            className="rounded-full border border-line/30 px-4 py-2 font-mono text-xs uppercase tracking-widest2 text-cream transition-colors hover:border-lime hover:text-lime"
-          >
-            Subir
-          </button>
-        </form>
+        <MediaUploader kind="sitePhoto" accept="image/*" />
       </section>
 
       <section className="rounded-2xl border border-line/15 p-6 md:p-8">

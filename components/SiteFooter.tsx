@@ -20,6 +20,9 @@ export default async function SiteFooter() {
           <Link href="/contact" className="hover:text-lime">
             Contact
           </Link>
+          <Link href="/admin" className="hover:text-lime">
+            Editar
+          </Link>
         </div>
       </div>
     </footer>

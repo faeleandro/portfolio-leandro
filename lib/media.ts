@@ -1,52 +1,133 @@
-import { put } from "@vercel/blob";
+import { put, del } from "@vercel/blob";
 import sharp from "sharp";
+import { execFile } from "child_process";
+import { promisify } from "util";
+import { writeFile, readFile, unlink, mkdtemp, rm } from "fs/promises";
+import { tmpdir } from "os";
+import { join } from "path";
+import ffmpegPath from "ffmpeg-static";
 
-const MAX_DIMENSION = 2000;
+const execFileAsync = promisify(execFile);
+
+const MAX_IMAGE_DIMENSION = 2000;
 const JPEG_QUALITY = 82;
+const MAX_VIDEO_DIMENSION = 1920;
 
 /**
- * Sube un archivo (foto/video) a Vercel Blob y devuelve su URL pública.
- * Las fotos se redimensionan y comprimen automáticamente (fotos de cámara
- * o celular sin optimizar pueden pesar 20-40MB — eso rompe la performance
- * del sitio y satura el storage). Los videos se suben tal cual.
+ * Comprime un video con ffmpeg preservando buena calidad visual:
+ * - Achica solo si supera 1920px en el lado más largo (nunca agranda).
+ * - CRF 20 (H.264): visualmente muy cercano al original, bien liviano.
+ * - +faststart: permite reproducir mientras carga en vez de esperar todo
+ *   el archivo.
  */
-export async function uploadMedia(file: File, folder: string): Promise<string> {
-  const isImage = file.type.startsWith("image/");
+async function compressVideoBuffer(buffer: Buffer): Promise<Buffer> {
+  if (!ffmpegPath) {
+    throw new Error("ffmpeg no está disponible en este entorno.");
+  }
 
-  const safeBaseName = file.name
+  const dir = await mkdtemp(join(tmpdir(), "video-"));
+  const inPath = join(dir, "in.mp4");
+  const outPath = join(dir, "out.mp4");
+
+  try {
+    await writeFile(inPath, buffer);
+
+    await execFileAsync(ffmpegPath, [
+      "-y",
+      "-i",
+      inPath,
+      "-vf",
+      `scale=w='min(${MAX_VIDEO_DIMENSION},iw)':h='min(${MAX_VIDEO_DIMENSION},ih)':force_original_aspect_ratio=decrease:force_divisible_by=2`,
+      "-c:v",
+      "libx264",
+      "-preset",
+      "faster",
+      "-crf",
+      "20",
+      "-c:a",
+      "aac",
+      "-b:a",
+      "160k",
+      "-movflags",
+      "+faststart",
+      outPath,
+    ]);
+
+    return await readFile(outPath);
+  } finally {
+    await rm(dir, { recursive: true, force: true }).catch(() => {});
+  }
+}
+
+function safeName(name: string): string {
+  return name
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
-    .replace(/\.[^.]+$/, "") // saca la extensión original
+    .replace(/\.[^.]+$/, "")
     .replace(/[^a-zA-Z0-9.\-_]/g, "-")
     .toLowerCase();
+}
+
+/**
+ * Toma un archivo YA subido a Blob (por el cliente, directo desde el
+ * navegador — así no hay límite de tamaño) y lo reemplaza por una versión
+ * comprimida en el mismo storage. Si la compresión de video falla por
+ * cualquier motivo, se conserva el archivo original subido en vez de
+ * perder la carga del usuario.
+ */
+export async function compressUploadedBlob(
+  rawUrl: string,
+  folder: string,
+  originalName: string,
+  contentType: string
+): Promise<{ url: string; type: "image" | "video" }> {
+  const isImage = contentType.startsWith("image/");
+  const isVideo = contentType.startsWith("video/");
+  const base = safeName(originalName);
+
+  const res = await fetch(rawUrl);
+  if (!res.ok) throw new Error("No se pudo leer el archivo recién subido.");
+  const buffer = Buffer.from(await res.arrayBuffer());
 
   if (isImage) {
-    const buffer = Buffer.from(await file.arrayBuffer());
     const optimized = await sharp(buffer)
-      .rotate() // respeta la orientación EXIF antes de recomprimir
+      .rotate()
       .resize({
-        width: MAX_DIMENSION,
-        height: MAX_DIMENSION,
+        width: MAX_IMAGE_DIMENSION,
+        height: MAX_IMAGE_DIMENSION,
         fit: "inside",
         withoutEnlargement: true,
       })
       .jpeg({ quality: JPEG_QUALITY, mozjpeg: true })
       .toBuffer();
 
-    const pathname = `work/${folder}/${Date.now()}-${safeBaseName}.jpg`;
-    const blob = await put(pathname, optimized, {
+    const blob = await put(`work/${folder}/${Date.now()}-${base}.jpg`, optimized, {
       access: "public",
       contentType: "image/jpeg",
       addRandomSuffix: false,
     });
-    return blob.url;
+
+    await del(rawUrl).catch(() => {});
+    return { url: blob.url, type: "image" };
   }
 
-  const extension = file.name.split(".").pop() || "mp4";
-  const pathname = `work/${folder}/${Date.now()}-${safeBaseName}.${extension}`;
-  const blob = await put(pathname, file, {
-    access: "public",
-    addRandomSuffix: false,
-  });
-  return blob.url;
+  if (isVideo) {
+    try {
+      const compressed = await compressVideoBuffer(buffer);
+      const blob = await put(`work/${folder}/${Date.now()}-${base}.mp4`, compressed, {
+        access: "public",
+        contentType: "video/mp4",
+        addRandomSuffix: false,
+      });
+      await del(rawUrl).catch(() => {});
+      return { url: blob.url, type: "video" };
+    } catch (err) {
+      // No perdemos la carga del usuario si la compresión falla (video
+      // muy pesado, timeout, etc.) — se queda con el original ya subido.
+      console.error("No se pudo comprimir el video, se usa el original:", err);
+      return { url: rawUrl, type: "video" };
+    }
+  }
+
+  return { url: rawUrl, type: "image" };
 }
