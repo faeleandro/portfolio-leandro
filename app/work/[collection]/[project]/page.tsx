@@ -63,7 +63,7 @@ export default async function ProjectPage({
           priority
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-transparent" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(10,10,10,1)_0%,rgba(10,10,10,0.85)_18%,rgba(10,10,10,0.35)_42%,transparent_70%)]" />
         <div className="relative z-10 px-6 pt-8 md:px-10 md:pt-10">
           <PillBreadcrumb
             onMedia
@@ -83,12 +83,7 @@ export default async function ProjectPage({
         </div>
       </section>
 
-      {/* Difumina el corte entre la portada oscura y el brillo verde del
-          fondo — zona de transición más alta y con varios pasos para que
-          se sienta gradual en vez de un corte brusco. */}
-      <div className="pointer-events-none relative z-10 -mt-48 h-48 bg-[linear-gradient(to_bottom,rgba(10,10,10,1)_0%,rgba(10,10,10,0.8)_25%,rgba(10,10,10,0.45)_50%,rgba(10,10,10,0.15)_75%,rgba(10,10,10,0)_100%)]" />
-
-      <section className="mx-auto max-w-7xl px-6 pb-10 pt-4 md:px-10 md:pb-12">
+      <section className="mx-auto max-w-7xl px-6 pb-10 pt-10 md:px-10 md:pb-12 md:pt-14">
         <Reveal>
           <div className="grid grid-cols-2 gap-6 border-t border-lime/20 pt-8 font-mono text-sm uppercase tracking-widest2 text-muted sm:grid-cols-4">
             <div>
