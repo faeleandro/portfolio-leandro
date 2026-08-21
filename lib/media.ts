@@ -90,16 +90,27 @@ export async function compressUploadedBlob(
   const buffer = Buffer.from(await res.arrayBuffer());
 
   if (isImage) {
-    const optimized = await sharp(buffer)
-      .rotate()
-      .resize({
-        width: MAX_IMAGE_DIMENSION,
-        height: MAX_IMAGE_DIMENSION,
-        fit: "inside",
-        withoutEnlargement: true,
-      })
-      .jpeg({ quality: JPEG_QUALITY, mozjpeg: true })
-      .toBuffer();
+    let optimized: Buffer;
+    try {
+      optimized = await sharp(buffer)
+        .rotate()
+        .resize({
+          width: MAX_IMAGE_DIMENSION,
+          height: MAX_IMAGE_DIMENSION,
+          fit: "inside",
+          withoutEnlargement: true,
+        })
+        .jpeg({ quality: JPEG_QUALITY, mozjpeg: true })
+        .toBuffer();
+    } catch (err) {
+      // Formato no soportado (ej: HEIC de iPhone) u otro error de
+      // decodificación — mensaje claro en vez de una excepción cruda.
+      console.error("No se pudo procesar la imagen:", err);
+      await del(rawUrl).catch(() => {});
+      throw new Error(
+        "No se pudo procesar esa imagen. Probá exportarla en JPG o PNG y subila de nuevo."
+      );
+    }
 
     const blob = await put(`work/${folder}/${Date.now()}-${base}.jpg`, optimized, {
       access: "public",
