@@ -81,17 +81,17 @@ export default async function ProjectPage({
 
       <section className="mx-auto max-w-7xl px-6 py-12 md:px-10 md:py-16">
         <Reveal>
-          <div className="grid grid-cols-2 gap-6 border-t border-line/15 pt-8 font-mono text-xs uppercase tracking-widest2 text-muted sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-6 border-t border-lime/20 pt-8 font-mono text-xs uppercase tracking-widest2 text-muted sm:grid-cols-4">
             <div>
-              <div className="mb-2 text-[10px] text-muted/70">Cliente</div>
+              <div className="mb-2 text-[10px] text-lime/80">Cliente</div>
               <div className="text-cream">{project.client ?? project.title}</div>
             </div>
             <div>
-              <div className="mb-2 text-[10px] text-muted/70">Año</div>
+              <div className="mb-2 text-[10px] text-lime/80">Año</div>
               <div className="text-cream">{project.year ?? "Pendiente"}</div>
             </div>
             <div className="col-span-2 sm:col-span-2">
-              <div className="mb-2 text-[10px] text-muted/70">Servicios</div>
+              <div className="mb-2 text-[10px] text-lime/80">Servicios</div>
               <div className="text-cream">
                 {(project.services ?? project.category).join(" / ")}
               </div>

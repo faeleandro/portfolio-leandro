@@ -2,19 +2,26 @@ const ROWS = 16;
 const VIEW = 1000;
 
 /**
- * Fondo fijo detrás de todo el sitio: líneas horizontales deformadas por
- * un campo de turbulencia SVG animado, dando un efecto de "flujo" lima
- * sobre negro. 100% CSS/SVG (sin JS, sin imágenes).
+ * Fondo fijo detrás de todo el sitio.
  *
- * El filtro de turbulencia animado es carísimo de renderizar (recalcula
- * ruido en toda la pantalla en cada frame, y desactiva la aceleración por
- * GPU en la mayoría de los navegadores) — en celulares eso se siente como
- * scroll trabado y carga lenta. Por eso solo se muestra desde el
- * breakpoint md (tablet/desktop); en mobile queda solo el fondo plano.
+ * Dos capas:
+ * 1. "Glow orbs" — manchas lima difuminadas que flotan lentamente (solo
+ *    transform/opacity, aceleradas por GPU). Livianas de verdad: andan
+ *    bien en cualquier celular. Dan el efecto "futurista" en todos los
+ *    dispositivos.
+ * 2. Líneas de turbulencia SVG animadas — mucho más ricas visualmente,
+ *    pero el filtro (feTurbulence + feDisplacementMap) es carísimo de
+ *    recalcular en cada frame y desactiva la aceleración por GPU en la
+ *    mayoría de los navegadores. Por eso esta capa se reserva solo para
+ *    desktop/tablet (md+), donde el hardware la soporta sin problema.
  */
 export default function AnimatedBackground() {
   return (
     <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-paper">
+      <div className="absolute -left-1/4 top-[-10%] h-[55vh] w-[55vh] animate-drift rounded-full bg-lime/25 blur-[100px]" />
+      <div className="absolute -right-1/4 top-1/3 h-[50vh] w-[50vh] animate-drift-reverse rounded-full bg-lime/15 blur-[100px]" />
+      <div className="absolute bottom-[-10%] left-1/4 h-[45vh] w-[45vh] animate-pulse-glow rounded-full bg-lime/15 blur-[90px]" />
+
       <svg
         className="hidden h-full w-full opacity-40 mix-blend-screen md:block md:opacity-50"
         viewBox={`0 0 ${VIEW} ${VIEW}`}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MediaItem } from "@/lib/types";
 import PlaceholderMedia from "./PlaceholderMedia";
 
@@ -9,9 +9,18 @@ type Props = {
   label: string;
 };
 
+// Safari en iOS no soporta la API estándar de fullscreen sobre <video> —
+// usa su propio método "webkitEnterFullscreen". La tipamos acá porque no
+// forma parte de los tipos estándar del DOM.
+type FullscreenVideoElement = HTMLVideoElement & {
+  webkitEnterFullscreen?: () => void;
+  webkitRequestFullscreen?: () => void;
+};
+
 /**
- * Video con protagonismo visual y botón para abrir en pantalla completa
- * (usa la API nativa de fullscreen del navegador sobre el <video>).
+ * Video con protagonismo visual y botón para abrir en pantalla completa.
+ * El botón solo se muestra si el navegador realmente soporta alguna API
+ * de fullscreen — así nunca queda un botón que no hace nada.
  *
  * La orientación (horizontal o vertical, ej: un reel) se detecta sola en
  * cuanto el navegador lee los metadatos del archivo — no hace falta
@@ -22,11 +31,33 @@ export default function VideoBlock({ item, label }: Props) {
   const [orientation, setOrientation] = useState<"horizontal" | "vertical">(
     "horizontal"
   );
+  const [canFullscreen, setCanFullscreen] = useState(false);
 
   const hasVideo = Boolean(item?.src);
 
+  useEffect(() => {
+    const video = videoRef.current as FullscreenVideoElement | null;
+    if (!video) return;
+    setCanFullscreen(
+      Boolean(
+        video.requestFullscreen ||
+          video.webkitEnterFullscreen ||
+          video.webkitRequestFullscreen
+      )
+    );
+  }, [hasVideo]);
+
   function goFullscreen() {
-    videoRef.current?.requestFullscreen?.();
+    const video = videoRef.current as FullscreenVideoElement | null;
+    if (!video) return;
+
+    if (video.requestFullscreen) {
+      video.requestFullscreen().catch(() => {});
+    } else if (video.webkitEnterFullscreen) {
+      video.webkitEnterFullscreen();
+    } else if (video.webkitRequestFullscreen) {
+      video.webkitRequestFullscreen();
+    }
   }
 
   function handleLoadedMetadata() {
@@ -61,7 +92,7 @@ export default function VideoBlock({ item, label }: Props) {
         />
       )}
 
-      {hasVideo && (
+      {hasVideo && canFullscreen && (
         <button
           type="button"
           onClick={goFullscreen}
