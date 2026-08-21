@@ -12,13 +12,13 @@ export default async function SiteFooter() {
         </span>
         <div className="flex gap-6">
           <Link href="/#work" className="hover:text-lime">
-            Work
+            Trabajos
           </Link>
           <Link href="/about" className="hover:text-lime">
-            About
+            Sobre mí
           </Link>
           <Link href="/contact" className="hover:text-lime">
-            Contact
+            Contacto
           </Link>
           <Link href="/admin" className="hover:text-lime">
             Editar

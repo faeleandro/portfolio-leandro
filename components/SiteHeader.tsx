@@ -26,15 +26,15 @@ export default async function SiteHeader() {
         <nav className="flex flex-wrap items-center gap-2 font-mono text-xs uppercase tracking-widest2 text-lime sm:gap-3">
           <Link href="/#work" className={pillClass}>
             <PillFill />
-            Work
+            Trabajos
           </Link>
           <Link href="/about" className={pillClass}>
             <PillFill />
-            About
+            Sobre mí
           </Link>
           <Link href="/contact" className={pillClass}>
             <PillFill />
-            Contact
+            Contacto
           </Link>
         </nav>
       </div>
