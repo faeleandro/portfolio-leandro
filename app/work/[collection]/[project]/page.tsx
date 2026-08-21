@@ -62,7 +62,7 @@ export default async function ProjectPage({
           priority
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/10 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-transparent" />
         <div className="relative z-10 px-6 pt-8 md:px-10 md:pt-10">
           <PillBreadcrumb
             onMedia
@@ -73,11 +73,15 @@ export default async function ProjectPage({
           />
         </div>
         <div className="relative z-10 w-full px-6 pb-10 md:px-10 md:pb-16">
-          <h1 className="break-words font-serif text-4xl leading-none text-white sm:text-5xl md:text-9xl">
+          <h1 className="break-words font-serif text-4xl leading-none text-lime sm:text-5xl md:text-9xl">
             {project.title}
           </h1>
         </div>
       </section>
+
+      {/* Difumina el corte entre la portada oscura y el brillo verde del
+          fondo, en vez de pasar de golpe de negro sólido a tinte lima. */}
+      <div className="pointer-events-none relative z-10 -mt-24 h-24 bg-gradient-to-b from-ink to-transparent" />
 
       <section className="mx-auto max-w-7xl px-6 py-12 md:px-10 md:py-16">
         <Reveal>

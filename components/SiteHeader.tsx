@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getSite } from "@/lib/site";
 
 const pillClass =
-  "group relative shrink-0 overflow-hidden whitespace-nowrap rounded-full border border-line/30 px-3 py-1.5 font-mono text-[11px] uppercase tracking-widest2 text-cream transition-colors duration-500 ease-editorial hover:text-ink sm:px-4 sm:py-2 sm:text-xs";
+  "group relative shrink-0 overflow-hidden whitespace-nowrap rounded-full border border-lime/40 px-3 py-1.5 font-mono text-[11px] uppercase tracking-widest2 text-lime transition-colors duration-500 ease-editorial hover:text-ink sm:px-4 sm:py-2 sm:text-xs";
 
 function PillFill() {
   return (
@@ -23,7 +23,7 @@ export default async function SiteHeader() {
           <PillFill />
           {site.name}
         </Link>
-        <nav className="flex flex-wrap items-center gap-2 font-mono text-xs uppercase tracking-widest2 text-cream sm:gap-3">
+        <nav className="flex flex-wrap items-center gap-2 font-mono text-xs uppercase tracking-widest2 text-lime sm:gap-3">
           <Link href="/#work" className={pillClass}>
             <PillFill />
             Work
