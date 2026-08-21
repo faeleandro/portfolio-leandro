@@ -33,6 +33,10 @@ export default function PlaceholderMedia({
 }: Props) {
   const label = fallbackLabel ?? item?.alt ?? "Contenido pendiente";
   const fitClass = fit === "contain" ? "object-contain" : "object-cover";
+  const objectPosition =
+    item?.focalX !== undefined || item?.focalY !== undefined
+      ? `${item?.focalX ?? 50}% ${item?.focalY ?? 50}%`
+      : undefined;
 
   if (item?.src) {
     const isVideo =
@@ -45,6 +49,7 @@ export default function PlaceholderMedia({
             src={item.src}
             poster={item.poster}
             className={`h-full w-full ${fitClass}`}
+            style={objectPosition ? { objectPosition } : undefined}
             muted
             loop
             playsInline
@@ -63,6 +68,7 @@ export default function PlaceholderMedia({
           priority={priority}
           sizes={sizes ?? "100vw"}
           className={fitClass}
+          style={objectPosition ? { objectPosition } : undefined}
         />
       </div>
     );

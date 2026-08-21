@@ -230,6 +230,16 @@ export async function finalizeSitePhoto(
   return { url };
 }
 
+export async function updateSitePhotoFocal(focalX: number, focalY: number) {
+  await requireAdmin();
+  const content = await getContent();
+  if (!content.site.photo) return;
+  content.site.photo.focalX = focalX;
+  content.site.photo.focalY = focalY;
+  await saveContent(content);
+  revalidatePublicPages();
+}
+
 export async function finalizeSingleMedia(
   collection: string,
   slug: string,

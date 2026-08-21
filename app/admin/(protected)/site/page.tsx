@@ -1,6 +1,7 @@
 import { getSite } from "@/lib/site";
 import { saveSite } from "../../actions";
 import MediaUploader from "@/components/admin/MediaUploader";
+import FocalPointPicker from "@/components/admin/FocalPointPicker";
 
 export const dynamic = "force-dynamic";
 
@@ -39,12 +40,13 @@ export default async function AdminSitePage({
           Foto de portada
         </h2>
         {site.photo?.src && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={site.photo.src}
-            alt=""
-            className="mb-4 h-40 w-32 rounded-xl object-cover"
-          />
+          <div className="mb-4">
+            <FocalPointPicker
+              src={site.photo.src}
+              initialFocalX={site.photo.focalX}
+              initialFocalY={site.photo.focalY}
+            />
+          </div>
         )}
         <MediaUploader kind="sitePhoto" accept="image/*" />
       </section>

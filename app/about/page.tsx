@@ -27,7 +27,6 @@ export default async function AboutPage() {
               fallbackLabel={`Foto pendiente — ${site.name}`}
               className="aspect-square w-full rounded-full"
               sizes="200px"
-              fit="contain"
             />
           </div>
 

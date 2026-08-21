@@ -18,6 +18,11 @@ export type MediaItem = {
   type?: "image" | "video";
   alt?: string;
   caption?: string;
+  /** Punto focal (0-100) para object-position, cuando se muestra con
+   * object-cover — permite elegir qué parte de la foto queda visible en
+   * vez de que el recorte se centre siempre en el medio. */
+  focalX?: number;
+  focalY?: number;
 };
 
 export type Collection = {

@@ -17,7 +17,6 @@ export default async function HeroCard() {
             fallbackLabel={`Foto pendiente — ${site.name}`}
             className="aspect-[4/5] w-full rounded-[2rem]"
             sizes="(min-width: 768px) 320px, 80vw"
-            fit="contain"
           />
         </div>
 
