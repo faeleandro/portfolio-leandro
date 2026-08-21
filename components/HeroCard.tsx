@@ -21,7 +21,7 @@ export default async function HeroCard() {
         </div>
 
         <div className="flex min-w-0 flex-1 items-center">
-          <h1 className="min-w-0 font-serif text-5xl uppercase leading-[0.95] text-ink md:text-6xl lg:text-7xl">
+          <h1 className="min-w-0 break-words font-serif text-4xl uppercase leading-[0.95] text-ink sm:text-5xl md:text-6xl lg:text-7xl">
             Portafolio
             <br />
             Creativo

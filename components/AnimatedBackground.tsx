@@ -4,13 +4,19 @@ const VIEW = 1000;
 /**
  * Fondo fijo detrás de todo el sitio: líneas horizontales deformadas por
  * un campo de turbulencia SVG animado, dando un efecto de "flujo" lima
- * sobre negro. 100% CSS/SVG (sin JS, sin imágenes), muy liviano.
+ * sobre negro. 100% CSS/SVG (sin JS, sin imágenes).
+ *
+ * El filtro de turbulencia animado es carísimo de renderizar (recalcula
+ * ruido en toda la pantalla en cada frame, y desactiva la aceleración por
+ * GPU en la mayoría de los navegadores) — en celulares eso se siente como
+ * scroll trabado y carga lenta. Por eso solo se muestra desde el
+ * breakpoint md (tablet/desktop); en mobile queda solo el fondo plano.
  */
 export default function AnimatedBackground() {
   return (
     <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-paper">
       <svg
-        className="h-full w-full opacity-40 mix-blend-screen md:opacity-50"
+        className="hidden h-full w-full opacity-40 mix-blend-screen md:block md:opacity-50"
         viewBox={`0 0 ${VIEW} ${VIEW}`}
         preserveAspectRatio="xMidYMid slice"
         aria-hidden

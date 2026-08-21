@@ -46,7 +46,7 @@ export default function EditorialList({
               </span>
 
               <span className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
-                <span className="inline-block font-serif text-3xl uppercase leading-none tracking-tight text-cream transition-all duration-500 ease-editorial group-hover:translate-x-3 group-hover:text-ink sm:text-5xl md:text-6xl">
+                <span className="inline-block break-words font-serif text-2xl uppercase leading-none tracking-tight text-cream transition-all duration-500 ease-editorial group-hover:translate-x-3 group-hover:text-ink sm:text-4xl md:text-6xl">
                   {item.title}
                 </span>
                 {item.subtitle && (

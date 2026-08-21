@@ -24,7 +24,7 @@ export default function NextProjectLink({ project }: Props) {
         <span className="font-mono text-xs uppercase tracking-widest2 text-lime transition-colors duration-500">
           Siguiente proyecto
         </span>
-        <span className="mt-3 inline-flex items-baseline gap-4 font-serif text-5xl text-white transition-transform duration-500 ease-editorial group-hover:translate-x-3 md:text-8xl">
+        <span className="mt-3 flex max-w-full flex-wrap items-baseline gap-4 break-words font-serif text-4xl text-white transition-transform duration-500 ease-editorial group-hover:translate-x-3 sm:text-5xl md:text-8xl">
           {project.title}
           <span aria-hidden className="text-lime transition-transform duration-500 ease-editorial group-hover:translate-x-2">
             →

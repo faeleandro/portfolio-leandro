@@ -73,7 +73,7 @@ export default async function ProjectPage({
           />
         </div>
         <div className="relative z-10 w-full px-6 pb-10 md:px-10 md:pb-16">
-          <h1 className="font-serif text-5xl leading-none text-white md:text-9xl">
+          <h1 className="break-words font-serif text-4xl leading-none text-white sm:text-5xl md:text-9xl">
             {project.title}
           </h1>
         </div>

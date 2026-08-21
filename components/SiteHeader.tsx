@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getSite } from "@/lib/site";
 
 const pillClass =
-  "group relative overflow-hidden rounded-full border border-line/30 px-4 py-2 font-mono text-xs uppercase tracking-widest2 text-cream transition-colors duration-500 ease-editorial hover:text-ink";
+  "group relative shrink-0 overflow-hidden whitespace-nowrap rounded-full border border-line/30 px-3 py-1.5 font-mono text-[11px] uppercase tracking-widest2 text-cream transition-colors duration-500 ease-editorial hover:text-ink sm:px-4 sm:py-2 sm:text-xs";
 
 function PillFill() {
   return (
@@ -18,12 +18,12 @@ export default async function SiteHeader() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-line/10 bg-paper/90 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4 md:px-10">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-6 py-4 md:px-10">
         <Link href="/" className={pillClass}>
           <PillFill />
           {site.name}
         </Link>
-        <nav className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest2 text-cream sm:gap-3">
+        <nav className="flex flex-wrap items-center gap-2 font-mono text-xs uppercase tracking-widest2 text-cream sm:gap-3">
           <Link href="/#work" className={pillClass}>
             <PillFill />
             Work
