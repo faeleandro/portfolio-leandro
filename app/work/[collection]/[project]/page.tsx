@@ -10,6 +10,7 @@ import SectionHeading from "@/components/SectionHeading";
 import NextProjectLink from "@/components/NextProjectLink";
 import PillBreadcrumb from "@/components/PillBreadcrumb";
 import Reveal from "@/components/Reveal";
+import CrispHeading from "@/components/CrispHeading";
 import { getSite } from "@/lib/site";
 
 // El contenido vive en Vercel Blob y puede cambiar en cualquier momento
@@ -72,38 +73,42 @@ export default async function ProjectPage({
             ]}
           />
         </div>
-        <div className="relative z-10 w-full px-6 pb-10 [isolation:isolate] md:px-10 md:pb-16">
-          <h1 className="break-words font-serif text-4xl leading-none text-lime [will-change:transform] sm:text-5xl md:text-9xl">
-            {project.title}
+        <div className="relative z-10 w-full px-6 pb-10 md:px-10 md:pb-16">
+          <h1 className="text-lime">
+            <CrispHeading
+              text={project.title}
+              className="h-10 w-auto max-w-full sm:h-14 md:h-32"
+            />
           </h1>
         </div>
       </section>
 
       {/* Difumina el corte entre la portada oscura y el brillo verde del
-          fondo, en vez de pasar de golpe de negro sólido a tinte lima. */}
-      <div className="pointer-events-none relative z-10 -mt-24 h-24 bg-gradient-to-b from-ink to-transparent" />
+          fondo — zona de transición más alta y con varios pasos para que
+          se sienta gradual en vez de un corte brusco. */}
+      <div className="pointer-events-none relative z-10 -mt-48 h-48 bg-[linear-gradient(to_bottom,rgba(10,10,10,1)_0%,rgba(10,10,10,0.8)_25%,rgba(10,10,10,0.45)_50%,rgba(10,10,10,0.15)_75%,rgba(10,10,10,0)_100%)]" />
 
-      <section className="mx-auto max-w-7xl px-6 py-12 md:px-10 md:py-16">
+      <section className="mx-auto max-w-7xl px-6 pb-10 pt-4 md:px-10 md:pb-12">
         <Reveal>
-          <div className="grid grid-cols-2 gap-6 border-t border-lime/20 pt-8 font-mono text-xs uppercase tracking-widest2 text-muted sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-6 border-t border-lime/20 pt-8 font-mono text-sm uppercase tracking-widest2 text-muted sm:grid-cols-4">
             <div>
-              <div className="mb-2 text-[10px] text-lime/80">Cliente</div>
-              <div className="text-cream">{project.client ?? project.title}</div>
+              <div className="mb-2 text-xs text-lime/80">Cliente</div>
+              <div className="text-base text-cream">{project.client ?? project.title}</div>
             </div>
             <div>
-              <div className="mb-2 text-[10px] text-lime/80">Año</div>
-              <div className="text-cream">{project.year ?? "Pendiente"}</div>
+              <div className="mb-2 text-xs text-lime/80">Año</div>
+              <div className="text-base text-cream">{project.year ?? "Pendiente"}</div>
             </div>
             <div className="col-span-2 sm:col-span-2">
-              <div className="mb-2 text-[10px] text-lime/80">Servicios</div>
-              <div className="text-cream">
+              <div className="mb-2 text-xs text-lime/80">Servicios</div>
+              <div className="text-base text-cream">
                 {(project.services ?? project.category).join(" / ")}
               </div>
             </div>
           </div>
 
           {project.description && (
-            <p className="mt-10 max-w-2xl text-sm text-muted md:text-base">
+            <p className="mt-6 max-w-2xl text-base text-muted md:text-lg">
               {project.description}
             </p>
           )}
@@ -112,7 +117,7 @@ export default async function ProjectPage({
 
       {/* 02 — VIDEO */}
       {project.heroVideo && (
-        <section className="mx-auto max-w-7xl px-6 py-12 md:px-10 md:py-16">
+        <section className="mx-auto max-w-7xl px-6 py-8 md:px-10 md:py-10">
           <Reveal>
             <SectionHeading index="02" title="Video" />
             <VideoBlock item={project.heroVideo} label={project.title} />
@@ -122,7 +127,7 @@ export default async function ProjectPage({
 
       {/* 03 — FOTOGRAFÍA */}
       {hasImages && (
-        <section className="mx-auto max-w-7xl px-6 py-12 md:px-10 md:py-16">
+        <section className="mx-auto max-w-7xl px-6 py-8 md:px-10 md:py-10">
           <Reveal>
             <SectionHeading index="03" title="Fotografía" />
             <Gallery images={project.images!} projectTitle={project.title} />
@@ -132,7 +137,7 @@ export default async function ProjectPage({
 
       {/* 04 — PROCESO (opcional) */}
       {hasProcess && (
-        <section className="mx-auto max-w-7xl px-6 py-12 md:px-10 md:py-16">
+        <section className="mx-auto max-w-7xl px-6 py-8 md:px-10 md:py-10">
           <Reveal>
             <SectionHeading index="04" title="Proceso" />
             <MediaGrid
@@ -146,7 +151,7 @@ export default async function ProjectPage({
 
       {/* 05 — RESULTADO */}
       {hasResults && (
-        <section className="mx-auto max-w-7xl px-6 py-12 md:px-10 md:py-16">
+        <section className="mx-auto max-w-7xl px-6 py-8 md:px-10 md:py-10">
           <Reveal>
             <SectionHeading index="05" title="Resultado" />
             <MediaGrid

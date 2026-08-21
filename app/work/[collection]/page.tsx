@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import EditorialList, { EditorialListItem } from "@/components/EditorialList";
 import PillBreadcrumb from "@/components/PillBreadcrumb";
 import Reveal from "@/components/Reveal";
+import CrispHeading from "@/components/CrispHeading";
 import { getCollectionBySlug } from "@/lib/collections";
 import { getProjectsByCollection } from "@/lib/projects";
 import { getSite } from "@/lib/site";
@@ -54,8 +55,11 @@ export default async function CollectionPage({
           <p className="mt-6 font-mono text-xs uppercase tracking-widest2 text-muted">
             {collection.role}
           </p>
-          <h1 className="mt-4 max-w-4xl break-words font-serif text-4xl uppercase leading-[1.05] tracking-tight text-cream md:text-7xl">
-            {collection.title}
+          <h1 className="mt-4 max-w-4xl text-cream">
+            <CrispHeading
+              text={collection.title.toUpperCase()}
+              className="h-9 w-auto max-w-full sm:h-11 md:h-20"
+            />
           </h1>
           {collection.description && (
             <p className="mt-6 max-w-xl text-sm text-muted md:text-base">
