@@ -6,6 +6,8 @@ import SiteFooter from "@/components/SiteFooter";
 import Cursor from "@/components/Cursor";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import { getSite } from "@/lib/site";
+import { pick } from "@/lib/i18n";
+import { getLocale } from "@/lib/get-locale";
 
 const displayFont = Archivo_Black({
   subsets: ["latin"],
@@ -20,9 +22,10 @@ const bodyFont = Inter({
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSite();
+  const locale = getLocale();
   return {
     title: `${site.name} — Portafolio Creativo`,
-    description: site.role,
+    description: pick(locale, site.role, ""),
   };
 }
 
@@ -31,8 +34,10 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const locale = getLocale();
+
   return (
-    <html lang="es" className={`${displayFont.variable} ${bodyFont.variable}`}>
+    <html lang={locale} className={`${displayFont.variable} ${bodyFont.variable}`}>
       <body className="min-h-screen bg-paper font-sans text-cream antialiased">
         <AnimatedBackground />
         <Cursor />

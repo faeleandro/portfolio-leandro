@@ -62,10 +62,16 @@ export default async function AdminSitePage({
             <span className={labelClass}>Usuario de Instagram (@handle)</span>
             <input name="handle" defaultValue={site.handle} className={inputClass} />
           </label>
-          <label className="flex flex-col gap-1">
-            <span className={labelClass}>Rol</span>
-            <input name="role" defaultValue={site.role} className={inputClass} />
-          </label>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <label className="flex flex-col gap-1">
+              <span className={labelClass}>Rol (ES)</span>
+              <input name="role_es" defaultValue={site.role.es} className={inputClass} />
+            </label>
+            <label className="flex flex-col gap-1">
+              <span className={labelClass}>Role (EN)</span>
+              <input name="role_en" defaultValue={site.role.en} className={inputClass} />
+            </label>
+          </div>
           <label className="flex flex-col gap-1">
             <span className={labelClass}>Email</span>
             <input name="email" defaultValue={site.email} className={inputClass} />
@@ -96,17 +102,30 @@ export default async function AdminSitePage({
               className={inputClass}
             />
           </label>
-          <label className="flex flex-col gap-1">
-            <span className={labelClass}>
-              Bio (un párrafo por bloque — dejá una línea vacía entre cada uno)
-            </span>
-            <textarea
-              name="bio"
-              defaultValue={site.bio.join("\n\n")}
-              rows={10}
-              className={inputClass}
-            />
-          </label>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <label className="flex flex-col gap-1">
+              <span className={labelClass}>
+                Bio ES (un párrafo por bloque — línea vacía entre cada uno)
+              </span>
+              <textarea
+                name="bio_es"
+                defaultValue={site.bio.es.join("\n\n")}
+                rows={10}
+                className={inputClass}
+              />
+            </label>
+            <label className="flex flex-col gap-1">
+              <span className={labelClass}>
+                Bio EN (one paragraph per block — blank line between each)
+              </span>
+              <textarea
+                name="bio_en"
+                defaultValue={site.bio.en.join("\n\n")}
+                rows={10}
+                className={inputClass}
+              />
+            </label>
+          </div>
 
           <button
             type="submit"

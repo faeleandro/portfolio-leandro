@@ -59,19 +59,36 @@ export default async function AdminDashboard({
                   className={`${inputClass} flex-1 font-serif text-lg uppercase`}
                 />
               </div>
-              <input
-                name="role"
-                defaultValue={collection.role}
-                placeholder="Rol / forma de trabajo"
-                className={inputClass}
-              />
-              <textarea
-                name="description"
-                defaultValue={collection.description}
-                placeholder="Descripción de la etapa"
-                rows={2}
-                className={inputClass}
-              />
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <input
+                  name="role_es"
+                  defaultValue={collection.role?.es}
+                  placeholder="Rol / forma de trabajo (ES)"
+                  className={inputClass}
+                />
+                <input
+                  name="role_en"
+                  defaultValue={collection.role?.en}
+                  placeholder="Role (EN)"
+                  className={inputClass}
+                />
+              </div>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <textarea
+                  name="description_es"
+                  defaultValue={collection.description?.es}
+                  placeholder="Descripción de la etapa (ES)"
+                  rows={2}
+                  className={inputClass}
+                />
+                <textarea
+                  name="description_en"
+                  defaultValue={collection.description?.en}
+                  placeholder="Description (EN)"
+                  rows={2}
+                  className={inputClass}
+                />
+              </div>
               <button
                 type="submit"
                 className="w-fit rounded-full bg-lime px-4 py-2 font-mono text-xs uppercase tracking-widest2 text-ink transition-transform hover:-translate-y-0.5"

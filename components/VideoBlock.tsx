@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { MediaItem } from "@/lib/types";
+import { MediaItem, Locale } from "@/lib/types";
 import PlaceholderMedia from "./PlaceholderMedia";
 
 type Props = {
   item?: MediaItem;
   label: string;
+  locale: Locale;
 };
 
 // Safari en iOS no soporta la API estándar de fullscreen sobre <video> —
@@ -26,7 +27,7 @@ type FullscreenVideoElement = HTMLVideoElement & {
  * cuanto el navegador lee los metadatos del archivo — no hace falta
  * indicarla a mano en lib/projects.ts.
  */
-export default function VideoBlock({ item, label }: Props) {
+export default function VideoBlock({ item, label, locale }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [orientation, setOrientation] = useState<"horizontal" | "vertical">(
     "horizontal"
@@ -87,7 +88,7 @@ export default function VideoBlock({ item, label }: Props) {
       ) : (
         <PlaceholderMedia
           item={item}
-          fallbackLabel={`Video pendiente — ${label}`}
+          fallbackLabel={`${locale === "en" ? "Video pending" : "Video pendiente"} — ${label}`}
           className="h-full w-full"
         />
       )}

@@ -6,7 +6,7 @@ import { getContent, saveContent } from "@/lib/content";
 import { compressUploadedBlob } from "@/lib/media";
 import { requireAdmin } from "@/lib/auth";
 import { slugify } from "@/lib/slugify";
-import { MediaItem, Project } from "@/lib/types";
+import { Localized, MediaItem, Project } from "@/lib/types";
 
 function revalidatePublicPages() {
   revalidatePath("/", "layout");
@@ -26,6 +26,33 @@ function listField(formData: FormData, name: string): string[] {
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
+}
+
+/**
+ * Lee un par de campos "<name>_es" / "<name>_en" del formulario. Si falta
+ * uno de los dos, usa el otro como respaldo (para no dejar el sitio con un
+ * idioma vacío si Leandro todavía no cargó la traducción).
+ */
+function localizedField(formData: FormData, name: string): Localized<string> | undefined {
+  const es = textField(formData, `${name}_es`) ?? "";
+  const en = textField(formData, `${name}_en`) ?? "";
+  if (!es && !en) return undefined;
+  return { es: es || en, en: en || es };
+}
+
+/** Igual que localizedField, pero para textareas de párrafos (bio). */
+function localizedParagraphs(formData: FormData, name: string): Localized<string[]> {
+  const split = (raw: string) =>
+    raw
+      .split(/\n{2,}/)
+      .map((p) => p.trim())
+      .filter(Boolean);
+
+  const esRaw = formData.get(`${name}_es`);
+  const enRaw = formData.get(`${name}_en`);
+  const es = typeof esRaw === "string" ? split(esRaw) : [];
+  const en = typeof enRaw === "string" ? split(enRaw) : [];
+  return { es: es.length ? es : en, en: en.length ? en : es };
 }
 
 /**
@@ -55,19 +82,12 @@ export async function saveSite(formData: FormData) {
 
     content.site.name = textField(formData, "name") ?? content.site.name;
     content.site.handle = textField(formData, "handle") ?? content.site.handle;
-    content.site.role = textField(formData, "role") ?? content.site.role;
+    content.site.role = localizedField(formData, "role") ?? content.site.role;
     content.site.email = textField(formData, "email") ?? content.site.email;
     content.site.instagram = textField(formData, "instagram");
     content.site.linkedin = textField(formData, "linkedin");
     content.site.whatsapp = textField(formData, "whatsapp");
-
-    const bioRaw = formData.get("bio");
-    if (typeof bioRaw === "string") {
-      content.site.bio = bioRaw
-        .split(/\n{2,}/)
-        .map((p) => p.trim())
-        .filter(Boolean);
-    }
+    content.site.bio = localizedParagraphs(formData, "bio");
 
     await saveContent(content);
   }, "/admin/site?error=save");
@@ -91,8 +111,8 @@ export async function saveCollection(formData: FormData) {
     if (!collection) redirect("/admin?error=notfound");
 
     collection.title = textField(formData, "title") ?? collection.title;
-    collection.role = textField(formData, "role");
-    collection.description = textField(formData, "description");
+    collection.role = localizedField(formData, "role");
+    collection.description = localizedField(formData, "description");
 
     await saveContent(content);
   }, "/admin?error=save");
@@ -135,7 +155,7 @@ export async function createProject(formData: FormData) {
       title,
       client: textField(formData, "client") ?? title,
       category: listField(formData, "category"),
-      description: textField(formData, "description"),
+      description: localizedField(formData, "description"),
     };
 
     content.projects.push(newProject);
@@ -165,7 +185,7 @@ export async function saveProjectDetails(formData: FormData) {
     project.year = textField(formData, "year");
     project.category = listField(formData, "category");
     project.services = listField(formData, "services");
-    project.description = textField(formData, "description");
+    project.description = localizedField(formData, "description");
     project.website = textField(formData, "website");
     project.instagram = textField(formData, "instagram");
 

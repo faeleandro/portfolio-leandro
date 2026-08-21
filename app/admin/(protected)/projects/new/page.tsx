@@ -66,10 +66,16 @@ export default async function NewProjectPage({
           />
         </label>
 
-        <label className="flex flex-col gap-1">
-          <span className={labelClass}>Descripción</span>
-          <textarea name="description" rows={4} className={inputClass} />
-        </label>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <label className="flex flex-col gap-1">
+            <span className={labelClass}>Descripción (ES)</span>
+            <textarea name="description_es" rows={4} className={inputClass} />
+          </label>
+          <label className="flex flex-col gap-1">
+            <span className={labelClass}>Description (EN)</span>
+            <textarea name="description_en" rows={4} className={inputClass} />
+          </label>
+        </div>
 
         <button
           type="submit"

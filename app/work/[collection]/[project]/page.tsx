@@ -11,6 +11,8 @@ import NextProjectLink from "@/components/NextProjectLink";
 import PillBreadcrumb from "@/components/PillBreadcrumb";
 import Reveal from "@/components/Reveal";
 import { getSite } from "@/lib/site";
+import { pick, pickCategory, t } from "@/lib/i18n";
+import { getLocale } from "@/lib/get-locale";
 
 // El contenido vive en Vercel Blob y puede cambiar en cualquier momento
 // desde /admin — se renderiza siempre en el momento, sin cachear páginas
@@ -27,9 +29,10 @@ export async function generateMetadata({
     getSite(),
   ]);
   if (!project) return {};
+  const locale = getLocale();
   return {
     title: `${project.title} — ${site.name}`,
-    description: project.description ?? `${project.title} — ${site.name}`,
+    description: pick(locale, project.description, `${project.title} — ${site.name}`),
   };
 }
 
@@ -45,6 +48,8 @@ export default async function ProjectPage({
   if (!project) notFound();
 
   const nextProject = await getNextProject(project.slug);
+  const locale = getLocale();
+  const description = pick(locale, project.description, "");
 
   const heroBackground = project.coverImage ?? project.heroVideo;
   const hasImages = Boolean(project.images && project.images.length);
@@ -57,7 +62,7 @@ export default async function ProjectPage({
       <section className="relative flex h-[85vh] w-full flex-col justify-between overflow-hidden bg-ink">
         <PlaceholderMedia
           item={heroBackground}
-          fallbackLabel={`Portada pendiente — ${project.title}`}
+          fallbackLabel={`${t(locale, "cover_pending")} — ${project.title}`}
           className="absolute inset-0 h-full w-full"
           priority
           sizes="100vw"
@@ -87,25 +92,25 @@ export default async function ProjectPage({
         <Reveal>
           <div className="grid grid-cols-2 gap-6 border-t border-lime/20 pt-8 font-mono text-xs uppercase tracking-widest2 text-muted sm:grid-cols-4">
             <div>
-              <div className="mb-2 text-[10px] text-lime/80">Cliente</div>
+              <div className="mb-2 text-[10px] text-lime/80">{t(locale, "client")}</div>
               <div className="text-cream">{project.client ?? project.title}</div>
             </div>
             <div>
-              <div className="mb-2 text-[10px] text-lime/80">Año</div>
-              <div className="text-cream">{project.year ?? "Pendiente"}</div>
+              <div className="mb-2 text-[10px] text-lime/80">{t(locale, "year")}</div>
+              <div className="text-cream">{project.year ?? t(locale, "year_pending")}</div>
             </div>
             <div className="col-span-2 sm:col-span-2">
-              <div className="mb-2 text-[10px] text-lime/80">Servicios</div>
+              <div className="mb-2 text-[10px] text-lime/80">{t(locale, "services")}</div>
               <div className="text-cream">
-                {(project.services ?? project.category).join(" / ")}
+                {project.services
+                  ? project.services.join(" / ")
+                  : pickCategory(locale, project.category)}
               </div>
             </div>
           </div>
 
-          {project.description && (
-            <p className="mt-10 max-w-2xl text-sm text-muted md:text-base">
-              {project.description}
-            </p>
+          {description && (
+            <p className="mt-10 max-w-2xl text-sm text-muted md:text-base">{description}</p>
           )}
         </Reveal>
       </section>
@@ -114,8 +119,8 @@ export default async function ProjectPage({
       {project.heroVideo && (
         <section className="mx-auto max-w-7xl px-6 py-12 md:px-10 md:py-16">
           <Reveal>
-            <SectionHeading index="02" title="Video" />
-            <VideoBlock item={project.heroVideo} label={project.title} />
+            <SectionHeading index="02" title={t(locale, "section_video")} />
+            <VideoBlock item={project.heroVideo} label={project.title} locale={locale} />
           </Reveal>
         </section>
       )}
@@ -124,8 +129,8 @@ export default async function ProjectPage({
       {hasImages && (
         <section className="mx-auto max-w-7xl px-6 py-12 md:px-10 md:py-16">
           <Reveal>
-            <SectionHeading index="03" title="Fotografía" />
-            <Gallery images={project.images!} projectTitle={project.title} />
+            <SectionHeading index="03" title={t(locale, "section_photography")} />
+            <Gallery images={project.images!} projectTitle={project.title} locale={locale} />
           </Reveal>
         </section>
       )}
@@ -134,11 +139,12 @@ export default async function ProjectPage({
       {hasProcess && (
         <section className="mx-auto max-w-7xl px-6 py-12 md:px-10 md:py-16">
           <Reveal>
-            <SectionHeading index="04" title="Proceso" />
+            <SectionHeading index="04" title={t(locale, "section_process")} />
             <MediaGrid
               items={project.process!}
               projectTitle={project.title}
-              sectionLabel="Proceso"
+              sectionLabel={t(locale, "section_process")}
+              locale={locale}
             />
           </Reveal>
         </section>
@@ -148,11 +154,12 @@ export default async function ProjectPage({
       {hasResults && (
         <section className="mx-auto max-w-7xl px-6 py-12 md:px-10 md:py-16">
           <Reveal>
-            <SectionHeading index="05" title="Resultado" />
+            <SectionHeading index="05" title={t(locale, "section_results")} />
             <MediaGrid
               items={project.results!}
               projectTitle={project.title}
-              sectionLabel="Resultado"
+              sectionLabel={t(locale, "section_results")}
+              locale={locale}
             />
           </Reveal>
         </section>
@@ -161,7 +168,7 @@ export default async function ProjectPage({
       {!project.heroVideo && !hasImages && !hasProcess && !hasResults && (
         <section className="mx-auto max-w-7xl px-6 py-4 pb-16 md:px-10">
           <p className="border-t border-line/15 py-12 font-mono text-xs uppercase tracking-widest2 text-muted">
-            Contenido audiovisual pendiente de carga para este proyecto.
+            {t(locale, "pending_media")}
           </p>
         </section>
       )}
@@ -176,7 +183,7 @@ export default async function ProjectPage({
                 rel="noreferrer"
                 className="hover:text-lime"
               >
-                Sitio web ↗
+                {t(locale, "website")} ↗
               </a>
             )}
             {project.instagram && (
@@ -186,7 +193,7 @@ export default async function ProjectPage({
                 rel="noreferrer"
                 className="hover:text-lime"
               >
-                Instagram ↗
+                {t(locale, "instagram")} ↗
               </a>
             )}
           </div>
@@ -194,7 +201,7 @@ export default async function ProjectPage({
       )}
 
       {/* 06 — SIGUIENTE PROYECTO */}
-      {nextProject && <NextProjectLink project={nextProject} />}
+      {nextProject && <NextProjectLink project={nextProject} locale={locale} />}
     </div>
   );
 }
