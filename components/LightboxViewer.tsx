@@ -2,15 +2,13 @@
 
 import { useEffect, useRef, type TouchEvent } from "react";
 import { createPortal } from "react-dom";
-import { MediaItem, Locale } from "@/lib/types";
-import { t } from "@/lib/i18n";
+import { MediaItem } from "@/lib/types";
 import PlaceholderMedia from "./PlaceholderMedia";
 
 type Props = {
   items: MediaItem[];
   index: number;
   title: string;
-  locale: Locale;
   onClose: () => void;
   onPrev: () => void;
   onNext: () => void;
@@ -26,7 +24,6 @@ export default function LightboxViewer({
   items,
   index,
   title,
-  locale,
   onClose,
   onPrev,
   onNext,
@@ -69,14 +66,12 @@ export default function LightboxViewer({
     touchStartX.current = null;
   }
 
-  const pendingLabel = locale === "en" ? "Content pending" : "Contenido pendiente";
-
   return createPortal(
     <div
       className="fixed inset-0 z-[200] flex flex-col bg-ink/95 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
-      aria-label={`${t(locale, "ampliar")} — ${title}`}
+      aria-label={`Visor — ${title}`}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -86,10 +81,10 @@ export default function LightboxViewer({
           ref={closeButtonRef}
           type="button"
           onClick={onClose}
-          data-cursor={t(locale, "cerrar")}
+          data-cursor="Cerrar"
           className="hover:text-white"
         >
-          {t(locale, "cerrar")} ✕
+          Cerrar ✕
         </button>
       </div>
 
@@ -105,7 +100,7 @@ export default function LightboxViewer({
             >
               <PlaceholderMedia
                 item={item}
-                fallbackLabel={item.alt ?? `${pendingLabel} — ${title}`}
+                fallbackLabel={item.alt ?? `Contenido pendiente — ${title}`}
                 className="h-full w-full max-w-5xl"
                 sizes="100vw"
                 fit="contain"
@@ -119,8 +114,8 @@ export default function LightboxViewer({
             <button
               type="button"
               onClick={onPrev}
-              data-cursor={t(locale, "anterior")}
-              aria-label={t(locale, "anterior")}
+              data-cursor="Anterior"
+              aria-label="Anterior"
               className="absolute left-4 top-1/2 -translate-y-1/2 border border-white/40 bg-ink/50 px-3 py-3 text-lg text-white transition-colors hover:bg-white hover:text-ink md:left-8"
             >
               ‹
@@ -128,8 +123,8 @@ export default function LightboxViewer({
             <button
               type="button"
               onClick={onNext}
-              data-cursor={t(locale, "siguiente")}
-              aria-label={t(locale, "siguiente")}
+              data-cursor="Siguiente"
+              aria-label="Siguiente"
               className="absolute right-4 top-1/2 -translate-y-1/2 border border-white/40 bg-ink/50 px-3 py-3 text-lg text-white transition-colors hover:bg-white hover:text-ink md:right-8"
             >
               ›

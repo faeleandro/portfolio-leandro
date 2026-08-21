@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { getSite } from "@/lib/site";
-import { t } from "@/lib/i18n";
-import { getLocale } from "@/lib/get-locale";
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSite();
@@ -13,7 +11,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function ContactPage() {
   const site = await getSite();
-  const locale = getLocale();
 
   const links = [
     { label: "Email", href: `mailto:${site.email}`, value: site.email },
@@ -35,10 +32,10 @@ export default async function ContactPage() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-20 md:px-10 md:py-28">
       <p className="font-mono text-xs uppercase tracking-widest2 text-muted">
-        {t(locale, "contact_title")}
+        Contact
       </p>
       <h1 className="mt-4 font-serif text-4xl uppercase leading-[1.05] tracking-tight text-cream md:text-6xl">
-        {t(locale, "contact_heading")}
+        Trabajemos juntos
       </h1>
 
       <ul className="mt-12 border-t border-line/15">
@@ -48,7 +45,7 @@ export default async function ContactPage() {
               href={link.href}
               target={link.href.startsWith("http") ? "_blank" : undefined}
               rel={link.href.startsWith("http") ? "noreferrer" : undefined}
-              data-cursor={t(locale, "contact_go")}
+              data-cursor="Ir"
               className="group relative flex items-baseline justify-between overflow-hidden border-b border-line/15 px-4 py-5 font-mono text-sm uppercase tracking-widest2 transition-colors duration-500 ease-editorial md:px-6"
             >
               <span

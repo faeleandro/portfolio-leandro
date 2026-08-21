@@ -1,8 +1,5 @@
 import Link from "next/link";
 import { getSite } from "@/lib/site";
-import { t } from "@/lib/i18n";
-import { getLocale } from "@/lib/get-locale";
-import LanguageSwitcher from "./LanguageSwitcher";
 
 const pillClass =
   "group relative shrink-0 overflow-hidden whitespace-nowrap rounded-full border border-lime/40 px-3 py-1.5 font-mono text-[11px] uppercase tracking-widest2 text-lime transition-colors duration-500 ease-editorial hover:text-ink sm:px-4 sm:py-2 sm:text-xs";
@@ -18,7 +15,6 @@ function PillFill() {
 
 export default async function SiteHeader() {
   const site = await getSite();
-  const locale = getLocale();
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-line/10 bg-paper/90 backdrop-blur-sm">
@@ -27,23 +23,20 @@ export default async function SiteHeader() {
           <PillFill />
           {site.name}
         </Link>
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          <nav className="flex flex-wrap items-center gap-2 font-mono text-xs uppercase tracking-widest2 text-lime sm:gap-3">
-            <Link href="/#work" className={pillClass}>
-              <PillFill />
-              {t(locale, "nav_work")}
-            </Link>
-            <Link href="/about" className={pillClass}>
-              <PillFill />
-              {t(locale, "nav_about")}
-            </Link>
-            <Link href="/contact" className={pillClass}>
-              <PillFill />
-              {t(locale, "nav_contact")}
-            </Link>
-          </nav>
-          <LanguageSwitcher locale={locale} />
-        </div>
+        <nav className="flex flex-wrap items-center gap-2 font-mono text-xs uppercase tracking-widest2 text-lime sm:gap-3">
+          <Link href="/#work" className={pillClass}>
+            <PillFill />
+            Work
+          </Link>
+          <Link href="/about" className={pillClass}>
+            <PillFill />
+            About
+          </Link>
+          <Link href="/contact" className={pillClass}>
+            <PillFill />
+            Contact
+          </Link>
+        </nav>
       </div>
     </header>
   );

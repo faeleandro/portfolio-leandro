@@ -1,8 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { MediaItem, Locale } from "@/lib/types";
-import { t } from "@/lib/i18n";
+import { MediaItem } from "@/lib/types";
 import PlaceholderMedia from "./PlaceholderMedia";
 import LightboxViewer from "./LightboxViewer";
 
@@ -10,7 +9,6 @@ type Props = {
   items: MediaItem[];
   projectTitle: string;
   sectionLabel: string;
-  locale: Locale;
 };
 
 /**
@@ -18,7 +16,7 @@ type Props = {
  * tipo de piezas que tenga cada proyecto (fotos, videos, reels, piezas
  * gráficas). Si no hay items, no se renderiza nada.
  */
-export default function MediaGrid({ items, projectTitle, sectionLabel, locale }: Props) {
+export default function MediaGrid({ items, projectTitle, sectionLabel }: Props) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const total = items.length;
 
@@ -32,8 +30,6 @@ export default function MediaGrid({ items, projectTitle, sectionLabel, locale }:
 
   if (total === 0) return null;
 
-  const pendingLabel = locale === "en" ? "pending" : "pendiente";
-
   return (
     <>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6">
@@ -42,11 +38,11 @@ export default function MediaGrid({ items, projectTitle, sectionLabel, locale }:
             key={i}
             type="button"
             onClick={() => setOpenIndex(i)}
-            data-cursor={t(locale, "ampliar")}
+            data-cursor="Ampliar"
             aria-label={
               item.caption ??
               item.alt ??
-              `${t(locale, "ampliar")} ${sectionLabel.toLowerCase()} ${i + 1}/${total} — ${projectTitle}`
+              `Ampliar ${sectionLabel.toLowerCase()} ${i + 1} de ${total} — ${projectTitle}`
             }
             className={`group relative block overflow-hidden text-left ${
               i % 3 === 0 ? "sm:col-span-2 aspect-video" : "aspect-[4/5]"
@@ -54,7 +50,9 @@ export default function MediaGrid({ items, projectTitle, sectionLabel, locale }:
           >
             <PlaceholderMedia
               item={item}
-              fallbackLabel={item.alt ?? `${sectionLabel} ${pendingLabel} — ${projectTitle}`}
+              fallbackLabel={
+                item.alt ?? `${sectionLabel} pendiente — ${projectTitle}`
+              }
               className="h-full w-full transition-transform duration-700 ease-editorial group-hover:scale-[1.02]"
               sizes="100vw"
             />
@@ -72,7 +70,6 @@ export default function MediaGrid({ items, projectTitle, sectionLabel, locale }:
           items={items}
           index={openIndex}
           title={`${projectTitle} — ${sectionLabel}`}
-          locale={locale}
           onClose={close}
           onPrev={prev}
           onNext={next}

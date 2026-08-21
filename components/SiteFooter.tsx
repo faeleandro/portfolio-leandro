@@ -1,11 +1,8 @@
 import Link from "next/link";
 import { getSite } from "@/lib/site";
-import { t } from "@/lib/i18n";
-import { getLocale } from "@/lib/get-locale";
 
 export default async function SiteFooter() {
   const site = await getSite();
-  const locale = getLocale();
 
   return (
     <footer className="border-t border-line/15 px-6 py-10 md:px-10">
@@ -15,16 +12,16 @@ export default async function SiteFooter() {
         </span>
         <div className="flex gap-6">
           <Link href="/#work" className="hover:text-lime">
-            {t(locale, "nav_work")}
+            Work
           </Link>
           <Link href="/about" className="hover:text-lime">
-            {t(locale, "nav_about")}
+            About
           </Link>
           <Link href="/contact" className="hover:text-lime">
-            {t(locale, "nav_contact")}
+            Contact
           </Link>
           <Link href="/admin" className="hover:text-lime">
-            {t(locale, "nav_edit")}
+            Editar
           </Link>
         </div>
       </div>

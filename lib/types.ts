@@ -6,17 +6,7 @@
 // etc. Cada sección de la página de proyecto se muestra únicamente si hay
 // datos para esa sección — si el campo está vacío o no existe, la sección
 // simplemente no se renderiza.
-//
-// El sitio es bilingüe (español/inglés): los campos de texto largo/prosa
-// (bio, descripciones, roles) se escriben en los dos idiomas por separado
-// desde /admin — ver Localized<string> más abajo. Nombres propios (título
-// del proyecto, cliente, categorías) no se traducen.
 // ---------------------------------------------------------------------------
-
-export type Locale = "es" | "en";
-
-/** Un mismo valor, uno por idioma. */
-export type Localized<T> = { es: T; en: T };
 
 export type MediaItem = {
   /** Ruta dentro de /public, ej: "/work/beerlin/proceso-01.jpg". Si no hay
@@ -36,8 +26,8 @@ export type Collection = {
   order: number;
   title: string;
   /** Rol o forma de trabajo durante esta etapa. */
-  role?: Localized<string>;
-  description?: Localized<string>;
+  role?: string;
+  description?: string;
   coverImage?: MediaItem;
 };
 
@@ -52,7 +42,7 @@ export type Project = {
   category: string[];
   /** Detalle más largo de servicios realizados, si difiere de "category". */
   services?: string[];
-  description?: Localized<string>;
+  description?: string;
   coverImage?: MediaItem;
   heroVideo?: MediaItem;
   images?: MediaItem[];
@@ -66,14 +56,14 @@ export type Project = {
 export type SiteData = {
   name: string;
   handle: string;
-  role: Localized<string>;
+  role: string;
   email: string;
   instagram?: string;
   linkedin?: string;
   whatsapp?: string;
   photo?: MediaItem;
-  /** Párrafos de la bio en /about (uno por elemento), por idioma. */
-  bio: Localized<string[]>;
+  /** Párrafos de la bio en /about (uno por elemento). */
+  bio: string[];
 };
 
 export type ContentData = {

@@ -1,15 +1,13 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { MediaItem, Locale } from "@/lib/types";
-import { t } from "@/lib/i18n";
+import { MediaItem } from "@/lib/types";
 import PlaceholderMedia from "./PlaceholderMedia";
 import LightboxViewer from "./LightboxViewer";
 
 type Props = {
   images: MediaItem[];
   projectTitle: string;
-  locale: Locale;
 };
 
 /**
@@ -18,7 +16,7 @@ type Props = {
  * navegación anterior/siguiente, swipe en mobile, teclado, contador de
  * foto y transiciones suaves.
  */
-export default function Gallery({ images, projectTitle, locale }: Props) {
+export default function Gallery({ images, projectTitle }: Props) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const total = images.length;
 
@@ -32,8 +30,6 @@ export default function Gallery({ images, projectTitle, locale }: Props) {
 
   if (total === 0) return null;
 
-  const pendingLabel = locale === "en" ? "Photo pending" : "Foto pendiente";
-
   return (
     <>
       <div className="grid grid-cols-2 gap-1 sm:grid-cols-3 md:grid-cols-5 md:gap-2">
@@ -42,13 +38,13 @@ export default function Gallery({ images, projectTitle, locale }: Props) {
             key={i}
             type="button"
             onClick={() => setOpenIndex(i)}
-            data-cursor={t(locale, "ampliar")}
-            aria-label={img.alt ?? `${t(locale, "ampliar")} ${i + 1}/${total} — ${projectTitle}`}
+            data-cursor="Ampliar"
+            aria-label={img.alt ?? `Ampliar foto ${i + 1} de ${total} — ${projectTitle}`}
             className="group relative block aspect-square w-full overflow-hidden text-left"
           >
             <PlaceholderMedia
               item={img}
-              fallbackLabel={img.alt ?? `${pendingLabel} — ${projectTitle}`}
+              fallbackLabel={img.alt ?? `Foto pendiente — ${projectTitle}`}
               className="h-full w-full transition-transform duration-500 ease-editorial group-hover:scale-105"
               sizes="(min-width: 768px) 20vw, 33vw"
             />
@@ -61,7 +57,6 @@ export default function Gallery({ images, projectTitle, locale }: Props) {
           items={images}
           index={openIndex}
           title={projectTitle}
-          locale={locale}
           onClose={close}
           onPrev={prev}
           onNext={next}

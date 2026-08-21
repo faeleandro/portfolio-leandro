@@ -4,34 +4,22 @@ import MarqueeStrip from "@/components/MarqueeStrip";
 import Reveal from "@/components/Reveal";
 import { getCollections } from "@/lib/collections";
 import { getSite } from "@/lib/site";
-import { pick, t } from "@/lib/i18n";
-import { getLocale } from "@/lib/get-locale";
 
-const TAGS = {
-  es: [
-    "Fotografía",
-    "Producción Audiovisual",
-    "Contenido para Redes",
-    "Marcas & Gastronomía",
-    "Dirección de Arte",
-  ],
-  en: [
-    "Photography",
-    "Audiovisual Production",
-    "Content for Social Media",
-    "Brands & Gastronomy",
-    "Art Direction",
-  ],
-};
+const TAGS = [
+  "Fotografía",
+  "Producción Audiovisual",
+  "Contenido para Redes",
+  "Marcas & Gastronomía",
+  "Dirección de Arte",
+];
 
 export default async function HomePage() {
   const [collections, site] = await Promise.all([getCollections(), getSite()]);
-  const locale = getLocale();
 
   const items: EditorialListItem[] = collections.map((c) => ({
     index: c.order,
     title: c.title,
-    subtitle: pick(locale, c.role, ""),
+    subtitle: c.role,
     href: `/work/${c.slug}`,
     preview: c.coverImage,
   }));
@@ -44,18 +32,19 @@ export default async function HomePage() {
         </Reveal>
         <Reveal delay={150}>
           <p className="mt-8 max-w-xl font-mono text-xs uppercase tracking-widest2 text-muted">
-            {pick(locale, site.role, "")}
+            {site.role}
           </p>
           <p className="mt-4 max-w-xl text-sm text-muted md:text-base">
-            {t(locale, "home_journey")}
+            Un recorrido profesional contado en cuatro etapas, en orden
+            cronológico.
           </p>
         </Reveal>
       </section>
 
-      <MarqueeStrip items={TAGS[locale]} />
+      <MarqueeStrip items={TAGS} />
 
       <section id="work" className="mx-auto max-w-7xl px-6 pb-24 pt-4 md:px-10">
-        <EditorialList items={items} cursorLabel={t(locale, "view_stage")} />
+        <EditorialList items={items} cursorLabel="Ver etapa" />
       </section>
     </div>
   );
