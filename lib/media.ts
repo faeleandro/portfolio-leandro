@@ -59,6 +59,23 @@ async function compressVideoBuffer(buffer: Buffer): Promise<Buffer> {
   }
 }
 
+/**
+ * Detecta HEIC/HEIF (formato por defecto de la cámara del iPhone) por
+ * content-type o por los "magic bytes" del archivo — sharp no lo puede
+ * decodificar directamente en el entorno serverless, así que hace falta
+ * convertirlo a JPEG antes.
+ */
+function isHeic(buffer: Buffer, contentType: string): boolean {
+  if (/hei[cf]/i.test(contentType)) return true;
+  if (buffer.length < 12) return false;
+  const boxType = buffer.toString("ascii", 4, 8);
+  if (boxType !== "ftyp") return false;
+  const majorBrand = buffer.toString("ascii", 8, 12).toLowerCase();
+  return ["heic", "heix", "hevc", "hevx", "heim", "heis", "hevm", "hevs", "mif1", "msf1"].includes(
+    majorBrand
+  );
+}
+
 function safeName(name: string): string {
   return name
     .normalize("NFD")
@@ -90,9 +107,24 @@ export async function compressUploadedBlob(
   const buffer = Buffer.from(await res.arrayBuffer());
 
   if (isImage) {
-    let optimized: Buffer;
     try {
-      optimized = await sharp(buffer)
+      // HEIC/HEIF (cámara del iPhone por default) — sharp no lo puede leer
+      // directo en este entorno, así que primero se convierte a JPEG.
+      let sourceBuffer: Buffer = buffer;
+      if (isHeic(buffer, contentType)) {
+        // Import diferido a propósito: si esta librería (WASM) llegara a
+        // fallar en el entorno serverless, que solo afecte a HEIC y no
+        // tire abajo la carga de fotos normales (JPG/PNG).
+        const { default: heicConvert } = await import("heic-convert");
+        const jpegArrayBuffer = await heicConvert({
+          buffer,
+          format: "JPEG",
+          quality: 0.92,
+        });
+        sourceBuffer = Buffer.from(jpegArrayBuffer);
+      }
+
+      const optimized = await sharp(sourceBuffer)
         .rotate()
         .resize({
           width: MAX_IMAGE_DIMENSION,
@@ -102,24 +134,22 @@ export async function compressUploadedBlob(
         })
         .jpeg({ quality: JPEG_QUALITY, mozjpeg: true })
         .toBuffer();
-    } catch (err) {
-      // Formato no soportado (ej: HEIC de iPhone) u otro error de
-      // decodificación — mensaje claro en vez de una excepción cruda.
-      console.error("No se pudo procesar la imagen:", err);
+
+      const blob = await put(`work/${folder}/${Date.now()}-${base}.jpg`, optimized, {
+        access: "public",
+        contentType: "image/jpeg",
+        addRandomSuffix: false,
+      });
+
       await del(rawUrl).catch(() => {});
-      throw new Error(
-        "No se pudo procesar esa imagen. Probá exportarla en JPG o PNG y subila de nuevo."
-      );
+      return { url: blob.url, type: "image" };
+    } catch (err) {
+      // Cualquier falla al procesar (formato raro, decodificación, etc.)
+      // no debe frenar la carga: se guarda el archivo original tal cual,
+      // igual que con los videos que no se pudieron comprimir.
+      console.error("No se pudo procesar la imagen, se usa el original:", err);
+      return { url: rawUrl, type: "image" };
     }
-
-    const blob = await put(`work/${folder}/${Date.now()}-${base}.jpg`, optimized, {
-      access: "public",
-      contentType: "image/jpeg",
-      addRandomSuffix: false,
-    });
-
-    await del(rawUrl).catch(() => {});
-    return { url: blob.url, type: "image" };
   }
 
   if (isVideo) {

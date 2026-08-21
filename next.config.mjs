@@ -8,11 +8,13 @@ const nextConfig = {
     ],
   },
   experimental: {
-    // Asegura que el binario de ffmpeg (usado para comprimir videos
-    // subidos desde /admin) se incluya en el bundle serverless de Vercel.
+    // Asegura que se incluyan en el bundle serverless de Vercel los
+    // binarios que Next no detecta solo (requires dinámicos, no estáticos):
+    // ffmpeg (compresión de video) y el WASM de libheif (conversión de
+    // fotos HEIC/HEIF, formato por defecto de la cámara del iPhone).
     outputFileTracingIncludes: {
-      "/api/**/*": ["./node_modules/ffmpeg-static/**"],
-      "/admin/**/*": ["./node_modules/ffmpeg-static/**"],
+      "/api/**/*": ["./node_modules/ffmpeg-static/**", "./node_modules/libheif-js/**"],
+      "/admin/**/*": ["./node_modules/ffmpeg-static/**", "./node_modules/libheif-js/**"],
     },
   },
 };
