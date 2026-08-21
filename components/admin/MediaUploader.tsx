@@ -10,6 +10,7 @@ import {
   type SingleMediaField,
   type ListMediaField,
 } from "@/app/admin/actions";
+import type { MediaFormat } from "@/lib/media";
 
 type Props =
   | { kind: "sitePhoto"; accept: string; buttonLabel?: string }
@@ -41,6 +42,7 @@ type Status = "idle" | "uploading" | "processing" | "error";
 export default function MediaUploader(props: Props) {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [format, setFormat] = useState<MediaFormat>("estandar");
   const router = useRouter();
 
   async function handleChange(e: ChangeEvent<HTMLInputElement>) {
@@ -72,7 +74,8 @@ export default function MediaUploader(props: Props) {
         await finalizeSitePhoto(
           uploaded[0].rawUrl,
           uploaded[0].originalName,
-          uploaded[0].contentType
+          uploaded[0].contentType,
+          format
         );
       } else if (props.kind === "single") {
         await finalizeSingleMedia(
@@ -81,10 +84,17 @@ export default function MediaUploader(props: Props) {
           props.field,
           uploaded[0].rawUrl,
           uploaded[0].originalName,
-          uploaded[0].contentType
+          uploaded[0].contentType,
+          format
         );
       } else {
-        await finalizeListMedia(props.collection, props.slug, props.field, uploaded);
+        await finalizeListMedia(
+          props.collection,
+          props.slug,
+          props.field,
+          uploaded,
+          format
+        );
       }
 
       router.refresh();
@@ -108,8 +118,37 @@ export default function MediaUploader(props: Props) {
         ? "Comprimiendo..."
         : (props.buttonLabel ?? "Subir");
 
+  const formatBtnClass = (active: boolean) =>
+    `rounded-full border px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 transition-colors ${
+      active
+        ? "border-lime bg-lime text-ink"
+        : "border-line/30 text-muted hover:border-lime hover:text-lime"
+    }`;
+
   return (
     <div className="flex flex-wrap items-center gap-3">
+      <div className="flex items-center gap-2" role="radiogroup" aria-label="Formato">
+        <button
+          type="button"
+          role="radio"
+          aria-checked={format === "estandar"}
+          disabled={isBusy}
+          onClick={() => setFormat("estandar")}
+          className={formatBtnClass(format === "estandar")}
+        >
+          Foto / video
+        </button>
+        <button
+          type="button"
+          role="radio"
+          aria-checked={format === "historia"}
+          disabled={isBusy}
+          onClick={() => setFormat("historia")}
+          className={formatBtnClass(format === "historia")}
+        >
+          Historia (9:16)
+        </button>
+      </div>
       <label
         className={`cursor-pointer rounded-full border border-line/30 px-4 py-2 font-mono text-xs uppercase tracking-widest2 text-cream transition-colors hover:border-lime hover:text-lime ${
           isBusy ? "pointer-events-none opacity-60" : ""

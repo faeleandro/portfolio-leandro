@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getContent, saveContent } from "@/lib/content";
-import { compressUploadedBlob } from "@/lib/media";
+import { compressUploadedBlob, MediaFormat } from "@/lib/media";
 import { requireAdmin } from "@/lib/auth";
 import { slugify } from "@/lib/slugify";
 import { MediaItem, Project } from "@/lib/types";
@@ -218,11 +218,12 @@ async function findProject(collection: string, slug: string) {
 export async function finalizeSitePhoto(
   rawUrl: string,
   originalName: string,
-  contentType: string
+  contentType: string,
+  format: MediaFormat = "estandar"
 ) {
   await requireAdmin();
   const content = await getContent();
-  const { url } = await compressUploadedBlob(rawUrl, "site", originalName, contentType);
+  const { url } = await compressUploadedBlob(rawUrl, "site", originalName, contentType, format);
   const previousAlt = content.site.photo?.alt ?? content.site.name;
   content.site.photo = { src: url, alt: previousAlt };
   await saveContent(content);
@@ -246,7 +247,8 @@ export async function finalizeSingleMedia(
   field: SingleMediaField,
   rawUrl: string,
   originalName: string,
-  contentType: string
+  contentType: string,
+  format: MediaFormat = "estandar"
 ) {
   await requireAdmin();
   const { content, project } = await findProject(collection, slug);
@@ -254,7 +256,8 @@ export async function finalizeSingleMedia(
     rawUrl,
     `${collection}/${slug}`,
     originalName,
-    contentType
+    contentType,
+    format
   );
   project[field] = { src: url, type, alt: project.title } satisfies MediaItem;
   await saveContent(content);
@@ -266,7 +269,8 @@ export async function finalizeListMedia(
   collection: string,
   slug: string,
   field: ListMediaField,
-  uploads: { rawUrl: string; originalName: string; contentType: string }[]
+  uploads: { rawUrl: string; originalName: string; contentType: string }[],
+  format: MediaFormat = "estandar"
 ) {
   await requireAdmin();
   const { content, project } = await findProject(collection, slug);
@@ -278,7 +282,8 @@ export async function finalizeListMedia(
       u.rawUrl,
       `${collection}/${slug}`,
       u.originalName,
-      u.contentType
+      u.contentType,
+      format
     );
     added.push({ src: url, type, alt: project.title });
   }
